@@ -50,15 +50,15 @@ export default function App(props) {
   } else {
     return (
       <ErrorBoundary>
-      <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-        <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
-          <Stack.Navigator>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="NewGame" component={NewGameScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </View>
+        <View style={styles.container}>
+          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+          <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
+            <Stack.Navigator>
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="NewGame" component={NewGameScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </View>
       </ErrorBoundary>
     );
   }
