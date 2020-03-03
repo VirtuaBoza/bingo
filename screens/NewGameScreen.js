@@ -1,32 +1,56 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, FlatList, SafeAreaView, TextInput, Image, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  FlatList,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
-function Item({text}) {
+function Item({ text }) {
   return (
     <View style={styles.item}>
       <Text>{text}</Text>
-    </View>);
+    </View>
+  );
 }
 
 function ItemSeparator() {
-  return <View style={styles.itemSeparator}/>;
+  return <View style={styles.itemSeparator} />;
 }
 
-function TileSelector({filename}) {
+function TileSelector({ filename }) {
   return (
     <TouchableOpacity>
-      {filename === '3x3wfree'
-        ? <Image source={require('../assets/images/3x3wfree.png')} style={styles.tileImage}/>
-        : filename === '3x3'
-        ? <Image source={require('../assets/images/3x3.png') } style={styles.tileImage}/>
-        : filename === '4x4'
-        ? <Image source={require('../assets/images/4x4.png') } style={styles.tileImage}/>
-        : filename === '5x5wfree'
-        ? <Image source={require('../assets/images/5x5wfree.png') } style={styles.tileImage}/>
-        : filename === '5x5'
-        ? <Image source={require('../assets/images/5x5.png') } style={styles.tileImage}/>
-        : null
-      }
+      {filename === '3x3wfree' ? (
+        <Image
+          source={require('../assets/images/3x3wfree.png')}
+          style={styles.tileImage}
+        />
+      ) : filename === '3x3' ? (
+        <Image
+          source={require('../assets/images/3x3.png')}
+          style={styles.tileImage}
+        />
+      ) : filename === '4x4' ? (
+        <Image
+          source={require('../assets/images/4x4.png')}
+          style={styles.tileImage}
+        />
+      ) : filename === '5x5wfree' ? (
+        <Image
+          source={require('../assets/images/5x5wfree.png')}
+          style={styles.tileImage}
+        />
+      ) : filename === '5x5' ? (
+        <Image
+          source={require('../assets/images/5x5.png')}
+          style={styles.tileImage}
+        />
+      ) : null}
     </TouchableOpacity>
   );
 }
@@ -44,18 +68,17 @@ export default function NewGameScreen() {
     setTimeout(() => {
       ref.current.focus();
     }, 1);
-    
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.tileSelectContainer}>
         <ScrollView horizontal={true}>
-          {items.length >= 8 && <TileSelector filename="3x3wfree"/>}
-          {items.length >= 9 && <TileSelector filename="3x3"/>}
-          {items.length >= 16 && <TileSelector filename="4x4"/>}
-          {items.length >= 24 && <TileSelector filename="5x5wfree"/>}
-          {items.length >= 25 && <TileSelector filename="5x5"/>}
+          {items.length >= 8 && <TileSelector filename="3x3wfree" />}
+          {items.length >= 9 && <TileSelector filename="3x3" />}
+          {items.length >= 16 && <TileSelector filename="4x4" />}
+          {items.length >= 24 && <TileSelector filename="5x5wfree" />}
+          {items.length >= 25 && <TileSelector filename="5x5" />}
         </ScrollView>
       </View>
       <TextInput
@@ -68,14 +91,13 @@ export default function NewGameScreen() {
       />
       <FlatList
         data={items}
-        renderItem={({item}) => <Item text={item} />}
+        renderItem={({ item }) => <Item text={item} />}
         keyExtractor={item => item}
         ItemSeparatorComponent={ItemSeparator}
       />
     </View>
   );
 }
-
 
 NewGameScreen.navigationOptions = {
   header: null,
@@ -111,5 +133,5 @@ const styles = StyleSheet.create({
   },
   debug2: {
     backgroundColor: 'blue',
-  }
+  },
 });
