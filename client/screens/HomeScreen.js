@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Button, View } from 'react-native';
+import { Button, StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function HomeScreen({ navigation }) {
@@ -13,7 +13,6 @@ export default function HomeScreen({ navigation }) {
           title="Start a New Game"
           onPress={() => navigation.navigate('NewGame')}
         />
-        <Button title="Join a Game" />
       </ScrollView>
     </View>
   );
