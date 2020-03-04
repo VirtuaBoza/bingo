@@ -1,10 +1,9 @@
-const GameModel = require('../../db/models/game');
+const gameService = require('../../services/game.service');
 
 module.exports = {
   post: async (req, res) => {
     const { gameName: name, userName: gameMaster } = req.body;
-    let game = new GameModel({ name, gameMaster });
-    game = await game.save();
+    const game = await gameService.create({ name, gameMaster });
     res.json(game);
   },
 };
