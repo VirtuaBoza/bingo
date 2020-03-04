@@ -1,15 +1,15 @@
-import * as React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
-import { SplashScreen } from 'expo';
-import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
+import { SplashScreen } from 'expo';
+import * as Font from 'expo-font';
+import * as React from 'react';
+import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import ErrorBoundary from './components/ErrorBoundary';
 import useLinking from './navigation/useLinking';
 import HomeScreen from './screens/HomeScreen';
+import LobbyScreen from './screens/LobbyScreen';
 import NewGameScreen from './screens/NewGameScreen';
-import ErrorBoundary from './components/ErrorBoundary';
 
 const Stack = createStackNavigator();
 
@@ -52,10 +52,14 @@ export default function App(props) {
       <ErrorBoundary>
         <View style={styles.container}>
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-          <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
+          <NavigationContainer
+            ref={containerRef}
+            initialState={initialNavigationState}
+          >
             <Stack.Navigator>
               <Stack.Screen name="Home" component={HomeScreen} />
-              <Stack.Screen name="NewGame" component={NewGameScreen} />
+              <Stack.Screen name="New Game" component={NewGameScreen} />
+              <Stack.Screen name="Lobby" component={LobbyScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </View>

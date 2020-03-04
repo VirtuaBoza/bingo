@@ -1,12 +1,8 @@
 import Constants from 'expo-constants';
-import { Platform } from 'react-native';
-
-const localhost =
-  Platform.OS === 'ios' ? 'http://localhost:8080' : 'http://192.168.1.23:8080';
 
 const ENV = {
   dev: {
-    apiUrl: localhost,
+    apiUrl: 'http://192.168.1.23:8080',
     amplitudeApiKey: null,
   },
   staging: {
