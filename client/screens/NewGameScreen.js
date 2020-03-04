@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Machine } from 'xstate';
 import gameService from '../services/gameService';
+import { useAuth } from '../utils/auth';
 
 const FORM_STATES = {
   invalid: 'invalid',
@@ -54,6 +55,15 @@ export default function NewGameScreen({ navigation }) {
   const [gameName, setGameName] = useState('');
   const [userName, setUserName] = useState('');
   const [state, send] = useMachine(formMachine);
+  const { getUsername, setUsername } = useAuth();
+
+  useEffect(() => {
+    getUsername().then(storedUsername => {
+      if (storedUsername) {
+        setUserName(storedUsername);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (gameName.length && userName.length) {
@@ -64,6 +74,7 @@ export default function NewGameScreen({ navigation }) {
   });
 
   function handleSubmit() {
+    setUsername(userName);
     send(EVENT.submit);
     gameService
       .createGame(gameName, userName)
@@ -79,6 +90,7 @@ export default function NewGameScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.label}>Game Name: </Text>
       <TextInput
+        value={gameName}
         onChangeText={setGameName}
         style={styles.input}
         editable={!state.matches(FORM_STATES.submitting)}
@@ -86,6 +98,7 @@ export default function NewGameScreen({ navigation }) {
       />
       <Text style={styles.label}>Your Name: </Text>
       <TextInput
+        value={userName}
         onChangeText={setUserName}
         style={styles.input}
         editable={!state.matches(FORM_STATES.submitting)}

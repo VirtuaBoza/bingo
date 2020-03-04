@@ -10,6 +10,7 @@ import useLinking from './navigation/useLinking';
 import HomeScreen from './screens/HomeScreen';
 import LobbyScreen from './screens/LobbyScreen';
 import NewGameScreen from './screens/NewGameScreen';
+import { AuthProvider } from './utils/auth';
 
 const Stack = createStackNavigator();
 
@@ -50,19 +51,21 @@ export default function App(props) {
   } else {
     return (
       <ErrorBoundary>
-        <View style={styles.container}>
-          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-          <NavigationContainer
-            ref={containerRef}
-            initialState={initialNavigationState}
-          >
-            <Stack.Navigator>
-              <Stack.Screen name="Home" component={HomeScreen} />
-              <Stack.Screen name="New Game" component={NewGameScreen} />
-              <Stack.Screen name="Lobby" component={LobbyScreen} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </View>
+        <AuthProvider>
+          <View style={styles.container}>
+            {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+            <NavigationContainer
+              ref={containerRef}
+              initialState={initialNavigationState}
+            >
+              <Stack.Navigator>
+                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="New Game" component={NewGameScreen} />
+                <Stack.Screen name="Lobby" component={LobbyScreen} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </View>
+        </AuthProvider>
       </ErrorBoundary>
     );
   }

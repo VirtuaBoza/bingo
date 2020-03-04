@@ -1,5 +1,5 @@
 import getEnvVars from '../environment';
-import httpClient from '../helpers/httpClient';
+import httpClient from '../utils/httpClient';
 const { apiUrl } = getEnvVars();
 const url = `${apiUrl}/api/games`;
 
