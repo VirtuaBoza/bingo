@@ -1,6 +1,5 @@
-import { StackActions } from '@react-navigation/native';
-import { useMachine } from '@xstate/react';
-import React, { useEffect, useState } from 'react';
+import { StackActions, useNavigation } from '@react-navigation/native';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Button,
@@ -9,9 +8,10 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Machine } from 'xstate';
+import Routes from '../constants/Routes';
+import useAuth from '../hooks/useAuth';
+import useMachine from '../hooks/useMachine';
 import gameService from '../services/gameService';
-import { useAuth } from '../utils/auth';
 
 const FORM_STATES = {
   invalid: 'invalid',
@@ -27,7 +27,7 @@ const EVENT = {
   fail: 'fail',
 };
 
-const formMachine = Machine({
+const formChart = {
   id: 'newGameForm',
   initial: FORM_STATES.invalid,
   states: {
@@ -49,13 +49,15 @@ const formMachine = Machine({
     },
     [FORM_STATES.failure]: {},
   },
-});
+};
 
-export default function NewGameScreen({ navigation }) {
+export default function NewGameScreen() {
+  const navigation = useNavigation();
   const [gameName, setGameName] = useState('');
   const [userName, setUserName] = useState('');
-  const [state, send] = useMachine(formMachine);
+  const [state, send] = useMachine(formChart);
   const { getUsername, setUsername } = useAuth();
+  const ref = useRef();
 
   useEffect(() => {
     getUsername().then(storedUsername => {
@@ -74,48 +76,69 @@ export default function NewGameScreen({ navigation }) {
   });
 
   function handleSubmit() {
-    setUsername(userName);
-    send(EVENT.submit);
-    gameService
-      .createGame(gameName, userName)
-      .then(game => {
-        navigation.dispatch(StackActions.replace('Lobby', { game }));
-      })
-      .catch(() => {
-        send(EVENT.fail);
-      });
+    ref.current.focus();
+  }
+
+  function handleFormSubmit() {
+    if (state.matches(FORM_STATES.valid)) {
+      setUsername(userName);
+      send(EVENT.submit);
+      gameService
+        .createGame(gameName, userName)
+        .then(game => {
+          navigation.dispatch(StackActions.replace(Routes.Lobby, { game }));
+        })
+        .catch(() => {
+          send(EVENT.fail);
+        });
+    }
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Game Name: </Text>
-      <TextInput
-        value={gameName}
-        onChangeText={setGameName}
-        style={styles.input}
-        editable={!state.matches(FORM_STATES.submitting)}
-        autoFocus
-      />
-      <Text style={styles.label}>Your Name: </Text>
-      <TextInput
-        value={userName}
-        onChangeText={setUserName}
-        style={styles.input}
-        editable={!state.matches(FORM_STATES.submitting)}
-      />
+      <View>
+        <Text style={styles.label}>Game Name:</Text>
+        <TextInput
+          placeholder="Game Name"
+          value={gameName}
+          onChangeText={setGameName}
+          style={styles.input}
+          editable={!state.matches(FORM_STATES.submitting)}
+          returnKeyType="next"
+          onSubmitEditing={handleSubmit}
+          blurOnSubmit={false}
+          selectTextOnFocus
+          enablesReturnKeyAutomatically
+          autoFocus
+        />
+        <Text style={styles.label}>Your Name:</Text>
+        <TextInput
+          placeholder="Your Name"
+          value={userName}
+          onChangeText={setUserName}
+          style={styles.input}
+          editable={!state.matches(FORM_STATES.submitting)}
+          returnKeyType="go"
+          onSubmitEditing={handleFormSubmit}
+          ref={ref}
+          selectTextOnFocus
+        />
+        <ActivityIndicator
+          animating={state.matches(FORM_STATES.submitting)}
+          size="large"
+        />
+        {state.matches(FORM_STATES.failure) && (
+          <Text>Something went wrong.</Text>
+        )}
+      </View>
       <Button
         title="Submit"
-        onPress={handleSubmit}
+        onPress={handleFormSubmit}
         disabled={
           state.matches(FORM_STATES.invalid) ||
           state.matches(FORM_STATES.submitting)
         }
       />
-      <ActivityIndicator
-        animating={state.matches(FORM_STATES.submitting)}
-        size="large"
-      />
-      {state.matches(FORM_STATES.failure) && <Text>Something went wrong.</Text>}
     </View>
   );
 }
@@ -129,6 +152,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 20,
+    justifyContent: 'space-between',
   },
   label: {
     fontSize: 18,

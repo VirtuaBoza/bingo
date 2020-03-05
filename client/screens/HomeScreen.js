@@ -1,19 +1,14 @@
 import React from 'react';
 import { Button, StyleSheet, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import Routes from '../constants/Routes';
 
 export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-      >
-        <Button
-          title="Start a New Game"
-          onPress={() => navigation.navigate('New Game')}
-        />
-      </ScrollView>
+      <Button
+        title="Start a New Game"
+        onPress={() => navigation.navigate(Routes.NewGame)}
+      />
     </View>
   );
 }
@@ -26,6 +21,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    justifyContent: 'center',
+    padding: 20,
   },
   contentContainer: {
     paddingTop: 30,

@@ -5,7 +5,9 @@ import { SplashScreen } from 'expo';
 import * as Font from 'expo-font';
 import * as React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import 'react-native-gesture-handler';
 import ErrorBoundary from './components/ErrorBoundary';
+import Routes from './constants/Routes';
 import useLinking from './navigation/useLinking';
 import HomeScreen from './screens/HomeScreen';
 import LobbyScreen from './screens/LobbyScreen';
@@ -59,9 +61,15 @@ export default function App(props) {
               initialState={initialNavigationState}
             >
               <Stack.Navigator>
-                <Stack.Screen name="Home" component={HomeScreen} />
-                <Stack.Screen name="New Game" component={NewGameScreen} />
-                <Stack.Screen name="Lobby" component={LobbyScreen} />
+                <Stack.Screen name={Routes.Home} component={HomeScreen} />
+                <Stack.Screen name={Routes.NewGame} component={NewGameScreen} />
+                <Stack.Screen
+                  name={Routes.Lobby}
+                  component={LobbyScreen}
+                  options={{
+                    headerTitleAlign: 'center',
+                  }}
+                />
               </Stack.Navigator>
             </NavigationContainer>
           </View>

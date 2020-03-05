@@ -1389,11 +1389,6 @@
     lodash "^4.5.0"
     prop-types "^15.6.1"
 
-"@xstate/react@^0.8.1":
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/@xstate/react/-/react-0.8.1.tgz#df200547cca24c909572b7aef1ddab8bca3a0603"
-  integrity sha512-8voZm4GX3x70lNQVvoGedoObPYapkQIbgMhE+xOQEsm8Ait4Zto6R01SZ6WJD4qvLl8JPV6uq96OcFRdEsVESg==
-
 abab@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.3.tgz#623e2075e02eb2d3f2475e49f99c91846467907a"
@@ -6878,10 +6873,10 @@ xpipe@^1.0.5:
   resolved "https://registry.yarnpkg.com/xpipe/-/xpipe-1.0.5.tgz#8dd8bf45fc3f7f55f0e054b878f43a62614dafdf"
   integrity sha1-jdi/Rfw/f1Xw4FS4ePQ6YmFNr98=
 
-xstate@^4.7.8:
-  version "4.7.8"
-  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.7.8.tgz#a12ae521b105711b06cf95ab2652c1640d75d62d"
-  integrity sha512-pRCBefTPvQRJWpvFi9xP4PkgozqpppKjC4xM1WjeFWxIroV1b7Jch4tnky30ZO4ywpVyn8bQMNRIC+5tuTfEKQ==
+xstate@^4.8.0:
+  version "4.8.0"
+  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.8.0.tgz#1aefa1f7828f84f61c356785615ffc0824ebf5a2"
+  integrity sha512-xHSYQtCHLkcrFRxa5lK4Lp1rnKt00a80jcKFMQiMBuE+6MvTYv7twwqYpzjsJoKFjGZB3GGEpZAuY1dmlPTh/g==
 
 xtend@~4.0.1:
   version "4.0.2"
