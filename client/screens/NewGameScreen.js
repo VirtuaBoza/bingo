@@ -9,9 +9,10 @@ import {
   View,
 } from 'react-native';
 import Routes from '../constants/Routes';
-import useAuth from '../hooks/useAuth';
 import useMachine from '../hooks/useMachine';
 import gameService from '../services/gameService';
+import { createSetUsernameAction } from '../store/reducers/userReducer';
+import { userSelector, useStore } from '../store/StoreContext';
 
 const FORM_STATES = {
   invalid: 'invalid',
@@ -54,18 +55,10 @@ const formChart = {
 export default function NewGameScreen() {
   const navigation = useNavigation();
   const [gameName, setGameName] = useState('');
-  const [userName, setUserName] = useState('');
-  const [state, send] = useMachine(formChart);
-  const { getUsername, setUsername } = useAuth();
+  const [user, dispatch] = useStore(userSelector);
+  const [userName, setUserName] = useState(user.username || '');
+  const [currentState, send] = useMachine(formChart);
   const ref = useRef();
-
-  useEffect(() => {
-    getUsername().then(storedUsername => {
-      if (storedUsername) {
-        setUserName(storedUsername);
-      }
-    });
-  }, []);
 
   useEffect(() => {
     if (gameName.length && userName.length) {
@@ -80,8 +73,8 @@ export default function NewGameScreen() {
   }
 
   function handleFormSubmit() {
-    if (state.matches(FORM_STATES.valid)) {
-      setUsername(userName);
+    if (currentState.matches(FORM_STATES.valid)) {
+      dispatch(createSetUsernameAction(userName));
       send(EVENT.submit);
       gameService
         .createGame(gameName, userName)
@@ -103,7 +96,7 @@ export default function NewGameScreen() {
           value={gameName}
           onChangeText={setGameName}
           style={styles.input}
-          editable={!state.matches(FORM_STATES.submitting)}
+          editable={!currentState.matches(FORM_STATES.submitting)}
           returnKeyType="next"
           onSubmitEditing={handleSubmit}
           blurOnSubmit={false}
@@ -117,17 +110,17 @@ export default function NewGameScreen() {
           value={userName}
           onChangeText={setUserName}
           style={styles.input}
-          editable={!state.matches(FORM_STATES.submitting)}
+          editable={!currentState.matches(FORM_STATES.submitting)}
           returnKeyType="go"
           onSubmitEditing={handleFormSubmit}
           ref={ref}
           selectTextOnFocus
         />
         <ActivityIndicator
-          animating={state.matches(FORM_STATES.submitting)}
+          animating={currentState.matches(FORM_STATES.submitting)}
           size="large"
         />
-        {state.matches(FORM_STATES.failure) && (
+        {currentState.matches(FORM_STATES.failure) && (
           <Text>Something went wrong.</Text>
         )}
       </View>
@@ -135,8 +128,8 @@ export default function NewGameScreen() {
         title="Submit"
         onPress={handleFormSubmit}
         disabled={
-          state.matches(FORM_STATES.invalid) ||
-          state.matches(FORM_STATES.submitting)
+          currentState.matches(FORM_STATES.invalid) ||
+          currentState.matches(FORM_STATES.submitting)
         }
       />
     </View>

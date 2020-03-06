@@ -20,8 +20,9 @@ export default function LobbyScreen() {
 
   useEffect(() => {
     navigation.setOptions({ title: `${game.name}` });
+    let timeout;
     if (ref.current) {
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         ref.current.focus();
       });
     }
@@ -31,6 +32,9 @@ export default function LobbyScreen() {
     );
     () => {
       keyboardRemoveListener.remove();
+      if (timeout) {
+        clearTimeout(timeout);
+      }
     };
   });
 
@@ -38,6 +42,7 @@ export default function LobbyScreen() {
     setTerms([...terms, '']);
   }
 
+  // FIXME: This seems to be throwing errors when the keyboard is dismissed
   function handleEndEditing() {
     setTerms(
       [...terms, newTerm].filter(

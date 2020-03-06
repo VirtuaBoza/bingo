@@ -12,7 +12,7 @@ import useLinking from './navigation/useLinking';
 import HomeScreen from './screens/HomeScreen';
 import LobbyScreen from './screens/LobbyScreen';
 import NewGameScreen from './screens/NewGameScreen';
-import { AuthProvider } from './utils/auth';
+import { StoreProvider } from './store/StoreContext';
 
 const Stack = createStackNavigator();
 
@@ -53,7 +53,7 @@ export default function App(props) {
   } else {
     return (
       <ErrorBoundary>
-        <AuthProvider>
+        <StoreProvider>
           <View style={styles.container}>
             {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
             <NavigationContainer
@@ -73,7 +73,7 @@ export default function App(props) {
               </Stack.Navigator>
             </NavigationContainer>
           </View>
-        </AuthProvider>
+        </StoreProvider>
       </ErrorBoundary>
     );
   }
