@@ -5,6 +5,7 @@ import Routes from '../constants/Routes';
 import { connect, selectGames } from '../store';
 
 function GamesScreen({ games, navigation }) {
+  console.log(games);
   function handleGamePress(game) {
     navigation.navigate(Routes.Lobby, { gameId: game._id });
   }
@@ -33,4 +34,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default connect({ games: selectGames })(GamesScreen);
+export default connect(() => ({ games: selectGames }))(GamesScreen);

@@ -20,17 +20,18 @@ export function selectGames(state) {
   return Object.values(state.games);
 }
 
-export function selectGameById(state) {
-  return id => state.games[id];
+export function selectGameById(id) {
+  return state => state.games[id];
 }
 
 export function connect(mapStateToProps, mapDispatchToProps) {
   return Component => {
-    return props => {
+    return ownProps => {
       const [state, dispatch] = useContext(StoreContext);
       let storeProps = {};
       if (mapStateToProps) {
-        for (let [key, value] of Object.entries(mapStateToProps)) {
+        const mapper = mapStateToProps(ownProps);
+        for (let [key, value] of Object.entries(mapper)) {
           storeProps[key] = value(state);
         }
       } else {
@@ -45,7 +46,7 @@ export function connect(mapStateToProps, mapDispatchToProps) {
       } else {
         dispatchProps = { dispatch };
       }
-      return <Component {...props} {...storeProps} {...dispatchProps} />;
+      return <Component {...ownProps} {...storeProps} {...dispatchProps} />;
     };
   };
 }

@@ -1,4 +1,3 @@
-import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Button,
@@ -13,10 +12,7 @@ import gameService from '../services/gameService';
 import { connect, selectGameById } from '../store';
 import { createSetGameTermsAction } from '../store/reducers/gamesReducer';
 
-function LobbyScreen({ route, getGameById, setGameTerms }) {
-  const { gameId } = route.params;
-  const game = getGameById(gameId);
-  const navigation = useNavigation();
+function LobbyScreen({ navigation, game, setGameTerms }) {
   const [newTerm, setNewTerm] = useState('');
   const [localTerms, setLocalTerms] = useState(game.terms);
   const ref = useRef();
@@ -86,7 +82,11 @@ function LobbyScreen({ route, getGameById, setGameTerms }) {
 }
 
 export default connect(
-  { getGameById: selectGameById },
+  ({ route }) => {
+    const { gameId } = route.params;
+    gameSelector = selectGameById(gameId);
+    return { game: gameSelector };
+  },
   { setGameTerms: createSetGameTermsAction }
 )(LobbyScreen);
 

@@ -145,10 +145,10 @@ function NewGameScreen({ user, navigation, setUsername, addGame }) {
   );
 }
 
-export default connect(
-  { user: selectUser },
-  { setUsername: createSetUsernameAction, addGame: createGameCreatedAction }
-)(NewGameScreen);
+export default connect(() => ({ user: selectUser }), {
+  setUsername: createSetUsernameAction,
+  addGame: createGameCreatedAction,
+})(NewGameScreen);
 
 NewGameScreen.navigationOptions = {
   header: null,
