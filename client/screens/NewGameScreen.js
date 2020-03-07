@@ -1,4 +1,4 @@
-import { StackActions, useNavigation } from '@react-navigation/native';
+import { StackActions } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -11,8 +11,9 @@ import {
 import Routes from '../constants/Routes';
 import useMachine from '../hooks/useMachine';
 import gameService from '../services/gameService';
+import { connect, userSelector } from '../store';
+import { createGameCreatedAction } from '../store/reducers/gamesReducer';
 import { createSetUsernameAction } from '../store/reducers/userReducer';
-import { userSelector, useStore } from '../store/StoreContext';
 
 const FORM_STATES = {
   invalid: 'invalid',
@@ -52,10 +53,8 @@ const formChart = {
   },
 };
 
-export default function NewGameScreen() {
-  const navigation = useNavigation();
+function NewGameScreen({ user, navigation, setUsername, addGame }) {
   const [gameName, setGameName] = useState('');
-  const [user, dispatch] = useStore(userSelector);
   const [userName, setUserName] = useState(user.username || '');
   const [currentState, send] = useMachine(formChart);
   const ref = useRef();
@@ -73,15 +72,23 @@ export default function NewGameScreen() {
   }
 
   function handleFormSubmit() {
-    if (currentState.matches(FORM_STATES.valid)) {
-      dispatch(createSetUsernameAction(userName));
+    if (
+      currentState.matches(FORM_STATES.valid) ||
+      currentState.matches(FORM_STATES.failure)
+    ) {
+      // dispatch(createSetUsernameAction(userName));
+      setUsername(userName);
       send(EVENT.submit);
       gameService
         .createGame(gameName, userName)
         .then(game => {
+          addGame(game);
           navigation.dispatch(StackActions.replace(Routes.Lobby, { game }));
         })
-        .catch(() => {
+        .catch(err => {
+          if (__DEV__) {
+            console.dir(err);
+          }
           send(EVENT.fail);
         });
     }
@@ -135,6 +142,11 @@ export default function NewGameScreen() {
     </View>
   );
 }
+
+export default connect(
+  { user: userSelector },
+  { setUsername: createSetUsernameAction, addGame: createGameCreatedAction }
+)(NewGameScreen);
 
 NewGameScreen.navigationOptions = {
   header: null,

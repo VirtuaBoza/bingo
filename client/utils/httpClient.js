@@ -6,6 +6,9 @@ export default {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-    }).then(res => res.json());
+    }).then(res => {
+      if (res.ok) return res.json();
+      throw new Error(res);
+    });
   },
 };

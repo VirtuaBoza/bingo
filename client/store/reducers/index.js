@@ -1,3 +1,4 @@
+import gamesReducer from './gamesReducer';
 import userReducer from './userReducer';
 
 export const ROOT_RESET = 'ROOT_RESET';
@@ -9,14 +10,24 @@ export function createRootResetAction(state) {
 }
 
 export default function rootReducer(state, action) {
+  let newState;
   switch (action.type) {
     case ROOT_RESET:
-      return action.payload;
+      newState = action.payload;
+      break;
     default:
-      return combineReducers({
+      newState = combineReducers({
         user: userReducer,
+        games: gamesReducer,
       })(state, action);
+      break;
   }
+  if (__DEV__) {
+    console.log('oldState', state);
+    console.log('action', action);
+    console.log('newState', newState);
+  }
+  return newState;
 }
 
 function combineReducers({ ...reducers }) {

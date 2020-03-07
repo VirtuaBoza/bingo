@@ -9,6 +9,10 @@ export default function HomeScreen({ navigation }) {
         title="Start a New Game"
         onPress={() => navigation.navigate(Routes.NewGame)}
       />
+      <Button
+        title="My Games"
+        onPress={() => navigation.navigate(Routes.Games)}
+      />
     </View>
   );
 }

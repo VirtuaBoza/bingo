@@ -9,10 +9,11 @@ import 'react-native-gesture-handler';
 import ErrorBoundary from './components/ErrorBoundary';
 import Routes from './constants/Routes';
 import useLinking from './navigation/useLinking';
+import GamesScreen from './screens/GamesScreen';
 import HomeScreen from './screens/HomeScreen';
 import LobbyScreen from './screens/LobbyScreen';
 import NewGameScreen from './screens/NewGameScreen';
-import { StoreProvider } from './store/StoreContext';
+import { StoreProvider } from './store';
 
 const Stack = createStackNavigator();
 
@@ -60,16 +61,15 @@ export default function App(props) {
               ref={containerRef}
               initialState={initialNavigationState}
             >
-              <Stack.Navigator>
+              <Stack.Navigator
+                screenOptions={{
+                  headerTitleAlign: 'center',
+                }}
+              >
                 <Stack.Screen name={Routes.Home} component={HomeScreen} />
                 <Stack.Screen name={Routes.NewGame} component={NewGameScreen} />
-                <Stack.Screen
-                  name={Routes.Lobby}
-                  component={LobbyScreen}
-                  options={{
-                    headerTitleAlign: 'center',
-                  }}
-                />
+                <Stack.Screen name={Routes.Lobby} component={LobbyScreen} />
+                <Stack.Screen name={Routes.Games} component={GamesScreen} />
               </Stack.Navigator>
             </NavigationContainer>
           </View>
