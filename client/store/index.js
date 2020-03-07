@@ -7,25 +7,21 @@ import { initialUserState } from './reducers/userReducer';
 
 const StoreContext = React.createContext();
 
-export const useStore = selector => {
-  const [state, dispatch] = useContext(StoreContext);
-  if (selector) {
-    return [selector(state), dispatch];
-  }
-  return [state, dispatch];
-};
-
-const initialState = {
+export const initialState = {
   user: initialUserState,
   games: initialGamesState,
 };
 
-export function userSelector(state) {
+export function selectUser(state) {
   return state.user;
 }
 
-export function gamesSelector(state) {
+export function selectGames(state) {
   return Object.values(state.games);
+}
+
+export function selectGameById(state) {
+  return id => state.games[id];
 }
 
 export function connect(mapStateToProps, mapDispatchToProps) {

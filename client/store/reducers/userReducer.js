@@ -10,10 +10,10 @@ export const initialUserState = {
   username: '',
 };
 
-export default function(user, action) {
-  switch (action.type) {
+export default function(user, { type, payload }) {
+  switch (type) {
     case USER_SET_USERNAME:
-      return { ...user, username: action.payload };
+      return { ...user, username: payload };
     default:
       return user;
   }

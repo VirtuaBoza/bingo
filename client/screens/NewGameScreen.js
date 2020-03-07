@@ -11,7 +11,7 @@ import {
 import Routes from '../constants/Routes';
 import useMachine from '../hooks/useMachine';
 import gameService from '../services/gameService';
-import { connect, userSelector } from '../store';
+import { connect, selectUser } from '../store';
 import { createGameCreatedAction } from '../store/reducers/gamesReducer';
 import { createSetUsernameAction } from '../store/reducers/userReducer';
 
@@ -83,7 +83,9 @@ function NewGameScreen({ user, navigation, setUsername, addGame }) {
         .createGame(gameName, userName)
         .then(game => {
           addGame(game);
-          navigation.dispatch(StackActions.replace(Routes.Lobby, { game }));
+          navigation.dispatch(
+            StackActions.replace(Routes.Lobby, { gameId: game._id })
+          );
         })
         .catch(err => {
           if (__DEV__) {
@@ -144,7 +146,7 @@ function NewGameScreen({ user, navigation, setUsername, addGame }) {
 }
 
 export default connect(
-  { user: userSelector },
+  { user: selectUser },
   { setUsername: createSetUsernameAction, addGame: createGameCreatedAction }
 )(NewGameScreen);
 

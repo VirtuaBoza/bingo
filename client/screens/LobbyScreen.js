@@ -1,4 +1,4 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Button,
@@ -6,16 +6,19 @@ import {
   Keyboard,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
+import gameService from '../services/gameService';
+import { connect, selectGameById } from '../store';
+import { createSetGameTermsAction } from '../store/reducers/gamesReducer';
 
-export default function LobbyScreen() {
-  const route = useRoute();
+function LobbyScreen({ route, getGameById, setGameTerms }) {
+  const { gameId } = route.params;
+  const game = getGameById(gameId);
   const navigation = useNavigation();
-  const { game } = route.params;
-  const [terms, setTerms] = useState([]);
   const [newTerm, setNewTerm] = useState('');
+  const [localTerms, setLocalTerms] = useState(game.terms);
   const ref = useRef();
 
   useEffect(() => {
@@ -23,48 +26,53 @@ export default function LobbyScreen() {
     let timeout;
     if (ref.current) {
       timeout = setTimeout(() => {
-        ref.current.focus();
+        if (ref.current) {
+          ref.current.focus();
+        }
       });
     }
-    const keyboardRemoveListener = Keyboard.addListener(
-      'keyboardDidHide',
-      handleEndEditing
-    );
+
+    function handleKeyboardHide() {
+      setLocalTerms(localTerms.filter(t => t));
+    }
+    Keyboard.addListener('keyboardDidHide', handleKeyboardHide);
+
     () => {
-      keyboardRemoveListener.remove();
       if (timeout) {
         clearTimeout(timeout);
       }
+      Keyboard.removeListener('keyboardDidHide', handleKeyboardHide);
     };
   });
 
   function handleAddTermClick() {
-    setTerms([...terms, '']);
+    setLocalTerms([...localTerms, '']);
   }
 
-  // FIXME: This seems to be throwing errors when the keyboard is dismissed
-  function handleEndEditing() {
-    setTerms(
-      [...terms, newTerm].filter(
-        (term, index, self) => term && self.indexOf(term) === index
-      )
-    );
+  function handleSubmitTerm() {
+    gameService.addTermToGame(game._id, newTerm).then(terms => {
+      setGameTerms(game._id, terms);
+      setLocalTerms([...terms, '']);
+      setNewTerm('');
+    });
   }
 
   return (
     <View style={styles.container}>
       <View>
         <FlatList
-          data={terms}
+          data={localTerms}
           renderItem={({ item }) => (
             <View>
               {item ? (
                 <Text>{item}</Text>
               ) : (
                 <TextInput
-                  onEndEditing={handleEndEditing}
+                  value={newTerm}
+                  onSubmitEditing={handleSubmitTerm}
                   onChangeText={setNewTerm}
                   ref={ref}
+                  blurOnSubmit={false}
                 />
               )}
             </View>
@@ -76,6 +84,11 @@ export default function LobbyScreen() {
     </View>
   );
 }
+
+export default connect(
+  { getGameById: selectGameById },
+  { setGameTerms: createSetGameTermsAction }
+)(LobbyScreen);
 
 const styles = StyleSheet.create({
   container: {

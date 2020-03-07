@@ -1,8 +1,10 @@
 import React from 'react';
 import { Button, StyleSheet, View } from 'react-native';
 import Routes from '../constants/Routes';
+import { connect, initialState } from '../store';
+import { createRootResetAction } from '../store/reducers';
 
-export default function HomeScreen({ navigation }) {
+function HomeScreen({ navigation, resetStore }) {
   return (
     <View style={styles.container}>
       <Button
@@ -13,9 +15,14 @@ export default function HomeScreen({ navigation }) {
         title="My Games"
         onPress={() => navigation.navigate(Routes.Games)}
       />
+      {__DEV__ && (
+        <Button title="Reset State" onPress={() => resetStore(initialState)} />
+      )}
     </View>
   );
 }
+
+export default connect(null, { resetStore: createRootResetAction })(HomeScreen);
 
 HomeScreen.navigationOptions = {
   header: null,

@@ -2,11 +2,11 @@ import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Routes from '../constants/Routes';
-import { connect, gamesSelector } from '../store';
+import { connect, selectGames } from '../store';
 
 function GamesScreen({ games, navigation }) {
   function handleGamePress(game) {
-    navigation.navigate(Routes.Lobby, { game });
+    navigation.navigate(Routes.Lobby, { gameId: game._id });
   }
 
   return (
@@ -33,4 +33,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default connect({ games: gamesSelector })(GamesScreen);
+export default connect({ games: selectGames })(GamesScreen);

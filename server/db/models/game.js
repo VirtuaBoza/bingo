@@ -8,6 +8,7 @@ const gameSchema = new mongoose.Schema({
   },
   name: String,
   gameMaster: String,
+  terms: [String],
 });
 
 module.exports = mongoose.model('Game', gameSchema);

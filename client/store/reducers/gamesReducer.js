@@ -6,12 +6,31 @@ export function createGameCreatedAction(game) {
   };
 }
 
+const GAMES_SET_GAME_TERMS = 'GAMES_SET_GAME_TERMS';
+export function createSetGameTermsAction(gameId, terms) {
+  return {
+    type: GAMES_SET_GAME_TERMS,
+    payload: {
+      gameId,
+      terms,
+    },
+  };
+}
+
 export const initialGamesState = {};
 
-export default function(games, action) {
-  switch (action.type) {
+export default function(games, { type, payload }) {
+  switch (type) {
     case GAMES_GAME_CREATED:
-      return { ...games, [action.payload._id]: action.payload };
+      return { ...games, [payload._id]: payload };
+    case GAMES_SET_GAME_TERMS:
+      return {
+        ...games,
+        [payload.gameId]: {
+          ...games[payload.gameId],
+          terms: payload.terms,
+        },
+      };
     default:
       return games;
   }
