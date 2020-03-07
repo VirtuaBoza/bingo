@@ -9,61 +9,32 @@ import {
   View,
 } from 'react-native';
 import Routes from '../constants/Routes';
-import useMachine from '../hooks/useMachine';
+import {
+  FORM_EVENT,
+  FORM_STATE,
+  useFormStateMachine,
+} from '../hooks/useMachine';
 import gameService from '../services/gameService';
 import { connect, selectUser } from '../store';
 import { createGameCreatedAction } from '../store/reducers/gamesReducer';
 import { createSetUsernameAction } from '../store/reducers/userReducer';
 
-const FORM_STATES = {
-  invalid: 'invalid',
-  valid: 'valid',
-  submitting: 'submitting',
-  failure: 'failure',
-};
+export default connect(() => ({ user: selectUser }), {
+  setUsername: createSetUsernameAction,
+  addGame: createGameCreatedAction,
+})(NewGameScreen);
 
-const EVENT = {
-  validate: 'validate',
-  invalidate: 'invalidate',
-  submit: 'submit',
-  fail: 'fail',
-};
-
-const formChart = {
-  id: 'newGameForm',
-  initial: FORM_STATES.invalid,
-  states: {
-    [FORM_STATES.invalid]: {
-      on: {
-        [EVENT.validate]: FORM_STATES.valid,
-      },
-    },
-    [FORM_STATES.valid]: {
-      on: {
-        [EVENT.submit]: FORM_STATES.submitting,
-        [EVENT.invalidate]: FORM_STATES.invalid,
-      },
-    },
-    [FORM_STATES.submitting]: {
-      on: {
-        [EVENT.fail]: FORM_STATES.failure,
-      },
-    },
-    [FORM_STATES.failure]: {},
-  },
-};
-
-function NewGameScreen({ user, navigation, setUsername, addGame }) {
+export function NewGameScreen({ user, navigation, setUsername, addGame }) {
   const [gameName, setGameName] = useState('');
   const [userName, setUserName] = useState(user.username || '');
-  const [currentState, send] = useMachine(formChart);
   const ref = useRef();
+  const [currentState, transition] = useFormStateMachine();
 
   useEffect(() => {
     if (gameName.length && userName.length) {
-      send(EVENT.validate);
+      transition(FORM_EVENT.validate);
     } else {
-      send(EVENT.invalidate);
+      transition(FORM_EVENT.invalidate);
     }
   });
 
@@ -73,12 +44,11 @@ function NewGameScreen({ user, navigation, setUsername, addGame }) {
 
   function handleFormSubmit() {
     if (
-      currentState.matches(FORM_STATES.valid) ||
-      currentState.matches(FORM_STATES.failure)
+      currentState.matches(FORM_STATE.valid) ||
+      currentState.matches(FORM_STATE.failure)
     ) {
-      // dispatch(createSetUsernameAction(userName));
       setUsername(userName);
-      send(EVENT.submit);
+      transition(FORM_EVENT.submit);
       gameService
         .createGame(gameName, userName)
         .then(game => {
@@ -91,7 +61,7 @@ function NewGameScreen({ user, navigation, setUsername, addGame }) {
           if (__DEV__) {
             console.dir(err);
           }
-          send(EVENT.fail);
+          transition(FORM_EVENT.fail);
         });
     }
   }
@@ -105,7 +75,7 @@ function NewGameScreen({ user, navigation, setUsername, addGame }) {
           value={gameName}
           onChangeText={setGameName}
           style={styles.input}
-          editable={!currentState.matches(FORM_STATES.submitting)}
+          editable={!currentState.matches(FORM_STATE.submitting)}
           returnKeyType="next"
           onSubmitEditing={handleSubmit}
           blurOnSubmit={false}
@@ -119,17 +89,17 @@ function NewGameScreen({ user, navigation, setUsername, addGame }) {
           value={userName}
           onChangeText={setUserName}
           style={styles.input}
-          editable={!currentState.matches(FORM_STATES.submitting)}
+          editable={!currentState.matches(FORM_STATE.submitting)}
           returnKeyType="go"
           onSubmitEditing={handleFormSubmit}
           ref={ref}
           selectTextOnFocus
         />
         <ActivityIndicator
-          animating={currentState.matches(FORM_STATES.submitting)}
+          animating={currentState.matches(FORM_STATE.submitting)}
           size="large"
         />
-        {currentState.matches(FORM_STATES.failure) && (
+        {currentState.matches(FORM_STATE.failure) && (
           <Text>Something went wrong.</Text>
         )}
       </View>
@@ -137,22 +107,13 @@ function NewGameScreen({ user, navigation, setUsername, addGame }) {
         title="Submit"
         onPress={handleFormSubmit}
         disabled={
-          currentState.matches(FORM_STATES.invalid) ||
-          currentState.matches(FORM_STATES.submitting)
+          currentState.matches(FORM_STATE.invalid) ||
+          currentState.matches(FORM_STATE.submitting)
         }
       />
     </View>
   );
 }
-
-export default connect(() => ({ user: selectUser }), {
-  setUsername: createSetUsernameAction,
-  addGame: createGameCreatedAction,
-})(NewGameScreen);
-
-NewGameScreen.navigationOptions = {
-  header: null,
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -170,11 +131,5 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderColor: '#ccc',
     padding: 8,
-  },
-  debug1: {
-    backgroundColor: 'red',
-  },
-  debug2: {
-    backgroundColor: 'blue',
   },
 });

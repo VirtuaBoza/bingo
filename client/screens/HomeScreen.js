@@ -4,7 +4,9 @@ import Routes from '../constants/Routes';
 import { connect, initialState } from '../store';
 import { createRootResetAction } from '../store/reducers';
 
-function HomeScreen({ navigation, resetStore }) {
+export default connect(null, { resetStore: createRootResetAction })(HomeScreen);
+
+export function HomeScreen({ navigation, resetStore }) {
   return (
     <View style={styles.container}>
       <Button
@@ -21,12 +23,6 @@ function HomeScreen({ navigation, resetStore }) {
     </View>
   );
 }
-
-export default connect(null, { resetStore: createRootResetAction })(HomeScreen);
-
-HomeScreen.navigationOptions = {
-  header: null,
-};
 
 const styles = StyleSheet.create({
   container: {

@@ -12,7 +12,16 @@ import gameService from '../services/gameService';
 import { connect, selectGameById } from '../store';
 import { createSetGameTermsAction } from '../store/reducers/gamesReducer';
 
-function LobbyScreen({ navigation, game, setGameTerms }) {
+export default connect(
+  ({ route }) => {
+    const { gameId } = route.params;
+    const gameSelector = selectGameById(gameId);
+    return { game: gameSelector };
+  },
+  { setGameTerms: createSetGameTermsAction }
+)(LobbyScreen);
+
+export function LobbyScreen({ navigation, game, setGameTerms }) {
   const [newTerm, setNewTerm] = useState('');
   const [localTerms, setLocalTerms] = useState(game.terms);
   const ref = useRef();
@@ -80,15 +89,6 @@ function LobbyScreen({ navigation, game, setGameTerms }) {
     </View>
   );
 }
-
-export default connect(
-  ({ route }) => {
-    const { gameId } = route.params;
-    const gameSelector = selectGameById(gameId);
-    return { game: gameSelector };
-  },
-  { setGameTerms: createSetGameTermsAction }
-)(LobbyScreen);
 
 const styles = StyleSheet.create({
   container: {
