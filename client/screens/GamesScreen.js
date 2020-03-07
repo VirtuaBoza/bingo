@@ -14,11 +14,11 @@ function GamesScreen({ games, navigation }) {
       <FlatList
         data={games}
         renderItem={({ item: game }) => (
-          <TouchableOpacity onPress={() => handleGamePress(item)}>
+          <TouchableOpacity onPress={() => handleGamePress(game)}>
             <Text>{game.name}</Text>
           </TouchableOpacity>
         )}
-        keyExtractor={item => item._id}
+        keyExtractor={game => game._id}
       />
     </View>
   );
