@@ -84,7 +84,7 @@ function LobbyScreen({ navigation, game, setGameTerms }) {
 export default connect(
   ({ route }) => {
     const { gameId } = route.params;
-    gameSelector = selectGameById(gameId);
+    const gameSelector = selectGameById(gameId);
     return { game: gameSelector };
   },
   { setGameTerms: createSetGameTermsAction }
