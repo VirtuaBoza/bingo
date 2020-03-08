@@ -1,9 +1,23 @@
+const defaultHeaders = {
+  'Content-Type': 'application/json',
+};
+
 export default {
+  get: url => {
+    return fetch(url, {
+      headers: {
+        ...defaultHeaders,
+      },
+    }).then(res => {
+      if (res.ok) return res.json();
+      throw new Error(res);
+    });
+  },
   post: (url, body) => {
-    return fetch(`${url}`, {
+    return fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        ...defaultHeaders,
       },
       body: JSON.stringify(body),
     }).then(res => {

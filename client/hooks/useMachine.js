@@ -54,10 +54,10 @@ export const FORM_EVENT = {
   fail: 'fail',
 };
 
-export const useFormStateMachine = () =>
+export const useFormStateMachine = initialState =>
   useMachine({
     id: 'formStateMachine',
-    initial: FORM_STATE.invalid,
+    initial: initialState || FORM_STATE.invalid,
     states: {
       [FORM_STATE.invalid]: {
         on: {
@@ -75,6 +75,10 @@ export const useFormStateMachine = () =>
           [FORM_EVENT.fail]: FORM_STATE.failure,
         },
       },
-      [FORM_STATE.failure]: {},
+      [FORM_STATE.failure]: {
+        [FORM_EVENT.validate]: FORM_STATE.valid,
+        [FORM_EVENT.submit]: FORM_STATE.submitting,
+        [FORM_EVENT.invalidate]: FORM_STATE.invalid,
+      },
     },
   });

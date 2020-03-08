@@ -7,7 +7,6 @@ import { connect, selectGames } from '../store';
 export default connect(() => ({ games: selectGames }))(GamesScreen);
 
 export function GamesScreen({ games, navigation }) {
-  console.log(games);
   function handleGamePress(game) {
     navigation.navigate(Routes.Lobby, { gameId: game._id });
   }

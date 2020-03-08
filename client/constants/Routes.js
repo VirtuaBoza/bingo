@@ -3,4 +3,5 @@ export default {
   NewGame: 'New Game',
   Lobby: 'Lobby',
   Games: 'Games',
+  JoinGame: 'Join Game',
 };

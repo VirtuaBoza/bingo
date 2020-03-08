@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, StyleSheet, View } from 'react-native';
+import { Button, StyleSheet } from 'react-native';
+import Stack from '../components/Stack';
 import Routes from '../constants/Routes';
 import { connect, initialState } from '../store';
 import { createRootResetAction } from '../store/reducers';
@@ -8,10 +9,14 @@ export default connect(null, { resetStore: createRootResetAction })(HomeScreen);
 
 export function HomeScreen({ navigation, resetStore }) {
   return (
-    <View style={styles.container}>
+    <Stack style={styles.container}>
       <Button
         title="Start a New Game"
         onPress={() => navigation.navigate(Routes.NewGame)}
+      />
+      <Button
+        title="Join Game"
+        onPress={() => navigation.navigate(Routes.JoinGame)}
       />
       <Button
         title="My Games"
@@ -20,7 +25,7 @@ export function HomeScreen({ navigation, resetStore }) {
       {__DEV__ && (
         <Button title="Reset State" onPress={() => resetStore(initialState)} />
       )}
-    </View>
+    </Stack>
   );
 }
 

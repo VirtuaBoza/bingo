@@ -6,4 +6,9 @@ module.exports = {
     const game = await gameService.create({ name, gameMaster });
     res.json(game);
   },
+  get: async (req, res) => {
+    const { gameId } = req.params;
+    const game = await gameService.get(gameId);
+    res.json(game);
+  },
 };

@@ -11,6 +11,7 @@ import Routes from './constants/Routes';
 import useLinking from './navigation/useLinking';
 import GamesScreen from './screens/GamesScreen';
 import HomeScreen from './screens/HomeScreen';
+import JoinGameScreen from './screens/JoinGameScreen';
 import LobbyScreen from './screens/LobbyScreen';
 import NewGameScreen from './screens/NewGameScreen';
 import { StoreProvider } from './store';
@@ -56,7 +57,7 @@ export default function App(props) {
       <ErrorBoundary>
         <StoreProvider>
           <View style={styles.container}>
-            {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+            {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
             <NavigationContainer
               ref={containerRef}
               initialState={initialNavigationState}
@@ -70,6 +71,10 @@ export default function App(props) {
                 <Stack.Screen name={Routes.NewGame} component={NewGameScreen} />
                 <Stack.Screen name={Routes.Lobby} component={LobbyScreen} />
                 <Stack.Screen name={Routes.Games} component={GamesScreen} />
+                <Stack.Screen
+                  name={Routes.JoinGame}
+                  component={JoinGameScreen}
+                />
               </Stack.Navigator>
             </NavigationContainer>
           </View>

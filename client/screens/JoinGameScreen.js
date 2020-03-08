@@ -1,4 +1,5 @@
 import { StackActions } from '@react-navigation/native';
+import * as Permissions from 'expo-permissions';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -22,58 +23,61 @@ import { createSetUsernameAction } from '../store/reducers/userReducer';
 export default connect(() => ({ user: selectUser }), {
   setUsername: createSetUsernameAction,
   addGame: createGameCreatedAction,
-})(NewGameScreen);
+})(JoinGameScreen);
 
-export function NewGameScreen({ user, navigation, setUsername, addGame }) {
-  const [gameName, setGameName] = useState('');
+export function JoinGameScreen({ user, addGame, setUsername, navigation }) {
+  const [code, setCode] = useState('');
   const [userName, setUserName] = useState(user.username || '');
-  const ref = useRef();
   const [currentState, transition] = useFormStateMachine();
+  const ref = useRef();
 
   useEffect(() => {
-    if (gameName.length && userName.length) {
+    if (code.length && userName.length) {
       transition(FORM_EVENT.validate);
     } else {
       transition(FORM_EVENT.invalidate);
     }
   });
 
-  function handleSubmit() {
-    ref.current.focus();
-  }
-
-  function handleFormSubmit() {
+  async function handleFormSubmit() {
     if (
       currentState.matches(FORM_STATE.valid) ||
       currentState.matches(FORM_STATE.failure)
     ) {
       setUsername(userName);
       transition(FORM_EVENT.submit);
-      gameService
-        .createGame(gameName, userName)
-        .then(game => {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      if (status !== 'granted') {
+        alert('You will not be able to play without notifications.');
+      } else {
+        try {
+          const game = await gameService.joinGame(code, userName);
           addGame(game);
           navigation.dispatch(
             StackActions.replace(Routes.Lobby, { gameId: game._id })
           );
-        })
-        .catch(err => {
+        } catch (err) {
           if (__DEV__) {
-            console.dir(err);
+            console.log(err);
           }
           transition(FORM_EVENT.fail);
-        });
+        }
+      }
     }
+  }
+
+  function handleSubmit() {
+    ref.current.focus();
   }
 
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.label}>Game Name:</Text>
+        <Text style={styles.label}>Enter a Game Code:</Text>
         <TextInput
-          placeholder="Game Name"
-          value={gameName}
-          onChangeText={setGameName}
+          placeholder="Game Code"
+          value={code}
+          onChangeText={setCode}
           style={styles.input}
           editable={!currentState.matches(FORM_STATE.submitting)}
           returnKeyType="next"
@@ -100,9 +104,7 @@ export function NewGameScreen({ user, navigation, setUsername, addGame }) {
           animating={currentState.matches(FORM_STATE.submitting)}
           size="large"
         />
-        {currentState.matches(FORM_STATE.failure) && (
-          <Text>Something went wrong.</Text>
-        )}
+        {currentState.matches(FORM_STATE.failure) && <Text>No bueno.</Text>}
       </View>
       <Button
         title="Submit"
