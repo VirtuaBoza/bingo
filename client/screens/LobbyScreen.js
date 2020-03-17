@@ -35,7 +35,6 @@ export function LobbyScreen({ navigation, game, setGameTerms, updateGame }) {
   useEffect(() => {
     gameService.getGame(game._id).then(game => {
       updateGame(game);
-      console.log('am i about to reset?');
       setLocalTerms(game.terms);
     });
   }, []);
