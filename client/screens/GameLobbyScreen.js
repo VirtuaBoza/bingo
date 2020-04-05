@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Button,
   FlatList,
   Keyboard,
   StyleSheet,
@@ -9,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Button, Label, PageContainer, Title } from '../components';
 import gameService from '../services/gameService';
 import { connect, selectGameById } from '../store';
 import {
@@ -28,25 +28,19 @@ export default connect(
   }
 )(GameLobbyScreen);
 
-export function GameLobbyScreen({
-  navigation,
-  game,
-  setGameTerms,
-  updateGame,
-}) {
+export function GameLobbyScreen({ game, setGameTerms, updateGame }) {
   const [newTerm, setNewTerm] = useState('');
   const [localTerms, setLocalTerms] = useState(game.terms);
   const ref = useRef();
 
   useEffect(() => {
-    gameService.getGame(game._id).then(game => {
+    gameService.getGame(game._id).then((game) => {
       updateGame(game);
       setLocalTerms(game.terms);
     });
   }, []);
 
   useEffect(() => {
-    navigation.setOptions({ title: `${game.name} (${game._id})` });
     let timeout;
     timeout = setTimeout(() => {
       if (ref.current) {
@@ -55,7 +49,7 @@ export function GameLobbyScreen({
     }, 1);
 
     function handleKeyboardHide() {
-      setLocalTerms(localTerms.filter(t => t.trim()));
+      setLocalTerms(localTerms.filter((t) => t.trim()));
     }
     Keyboard.addListener('keyboardDidHide', handleKeyboardHide);
 
@@ -72,7 +66,7 @@ export function GameLobbyScreen({
   }
 
   function handleSubmitTerm() {
-    gameService.addTermToGame(game._id, newTerm.trim()).then(terms => {
+    gameService.addTermToGame(game._id, newTerm.trim()).then((terms) => {
       setGameTerms(game._id, terms);
       setLocalTerms([...terms, '']);
       setNewTerm('');
@@ -84,7 +78,9 @@ export function GameLobbyScreen({
   }
 
   return (
-    <View style={styles.container}>
+    <PageContainer style={styles.container}>
+      <Title text={game.name} />
+      <Label text={game.players.length ? 'Players' : 'No Players'} />
       <View>
         <TouchableOpacity onPress={handlePlayersPress}>
           <Text>{game.players.length}</Text>
@@ -107,18 +103,15 @@ export function GameLobbyScreen({
             )}
           </View>
         )}
-        keyExtractor={item => item}
+        keyExtractor={(item) => item}
       />
       <Button title="Add Term" onPress={handleAddTermClick} />
-    </View>
+    </PageContainer>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
     justifyContent: 'space-between',
   },
   label: {

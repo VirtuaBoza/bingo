@@ -67,11 +67,9 @@ export default function App(props) {
               <Stack.Navigator
                 screenOptions={{
                   headerTintColor: '#F38BA6',
-                  // headerTransparent: true,
                   headerStyle: {
                     elevation: 0,
                     borderBottomWidth: 0,
-                    // shadowOpacity: 0,
                   },
                   title: '',
                 }}

@@ -4,7 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 function Button({ title, style, onPress, disabled }) {
   return (
     <TouchableOpacity onPress={onPress}>
-      <View style={[style, styles.container, disabled && styles.disabled]}>
+      <View style={[styles.container, style, disabled && styles.disabled]}>
         <Text style={styles.text}>{title}</Text>
       </View>
     </TouchableOpacity>
@@ -20,6 +20,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 50,
+    width: 250,
+    alignSelf: 'center',
   },
   disabled: {
     backgroundColor: '#F7BDC9',

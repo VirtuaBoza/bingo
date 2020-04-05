@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import Button from '../components/Button';
-import Stack from '../components/Stack';
+import { Button, Stack } from '../components';
 import Routes from '../constants/Routes';
 import { connect, initialState } from '../store';
 import { createRootResetAction } from '../store/reducers';
@@ -22,7 +21,7 @@ export function HomeScreen({ navigation, resetStore }) {
         title="Join a Game"
         onPress={() => navigation.navigate(Routes.JoinGame)}
       />
-      <Stack style={styles.stack}>
+      <Stack>
         <Button
           title="Start a New Game"
           onPress={() => navigation.navigate(Routes.NewGame)}
@@ -58,10 +57,5 @@ const styles = StyleSheet.create({
   primaryButton: {
     width: 300,
     marginBottom: 20,
-    alignSelf: 'center',
-  },
-  stack: {
-    width: 250,
-    alignSelf: 'center',
   },
 });
