@@ -1,13 +1,7 @@
 import { StackActions } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  Button,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { Button, Input, Stack, Title } from '../components';
 import Routes from '../constants/Routes';
 import {
   FORM_EVENT,
@@ -26,38 +20,47 @@ export default connect(() => ({ user: selectUser }), {
 
 export function NewGameScreen({ user, navigation, setUsername, addGame }) {
   const [gameName, setGameName] = useState('');
-  const [userName, setUserName] = useState(user.username || '');
+  const [internalUserName, setInternalUserName] = useState(user.username || '');
   const ref = useRef();
   const [currentState, transition] = useFormStateMachine();
 
   useEffect(() => {
-    if (gameName.length && userName.length) {
+    if (internalUserName) {
+      setTimeout(() => {
+        ref.current.focus();
+      }, 1);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (gameName.length && internalUserName.length) {
       transition(FORM_EVENT.validate);
     } else {
       transition(FORM_EVENT.invalidate);
     }
   });
 
-  function handleSubmit() {
+  function handleUsernameSubmit() {
     ref.current.focus();
   }
 
   function handleFormSubmit() {
     if (
-      currentState.matches(FORM_STATE.valid) ||
-      currentState.matches(FORM_STATE.failure)
+      !currentState.matches(FORM_STATE.invalid) &&
+      !currentState.matches(FORM_STATE.submitting)
     ) {
-      setUsername(userName);
+      setUsername(internalUserName);
       transition(FORM_EVENT.submit);
       gameService
-        .createGame(gameName, userName)
-        .then(game => {
+        .createGame(gameName, internalUserName)
+        .then((game) => {
           addGame(game);
           navigation.dispatch(
             StackActions.replace(Routes.Lobby, { gameId: game._id })
           );
         })
-        .catch(err => {
+        .catch((err) => {
+          console.log(err);
           if (__DEV__) {
             console.dir(err);
           }
@@ -68,27 +71,24 @@ export function NewGameScreen({ user, navigation, setUsername, addGame }) {
 
   return (
     <View style={styles.container}>
-      <View>
-        <Text style={styles.label}>Game Name:</Text>
-        <TextInput
-          placeholder="Game Name"
-          value={gameName}
-          onChangeText={setGameName}
-          style={styles.input}
+      <Stack>
+        <Title text="Start a New Game" />
+        <Input
+          label="Your Name"
+          value={internalUserName}
+          onChangeText={setInternalUserName}
           editable={!currentState.matches(FORM_STATE.submitting)}
           returnKeyType="next"
-          onSubmitEditing={handleSubmit}
+          onSubmitEditing={handleUsernameSubmit}
           blurOnSubmit={false}
           selectTextOnFocus
           enablesReturnKeyAutomatically
           autoFocus
         />
-        <Text style={styles.label}>Your Name:</Text>
-        <TextInput
-          placeholder="Your Name"
-          value={userName}
-          onChangeText={setUserName}
-          style={styles.input}
+        <Input
+          label="Game Name"
+          value={gameName}
+          onChangeText={setGameName}
           editable={!currentState.matches(FORM_STATE.submitting)}
           returnKeyType="go"
           onSubmitEditing={handleFormSubmit}
@@ -103,10 +103,11 @@ export function NewGameScreen({ user, navigation, setUsername, addGame }) {
         {currentState.matches(FORM_STATE.failure) && (
           <Text>Something went wrong.</Text>
         )}
-      </View>
+      </Stack>
       <Button
-        title="Submit"
+        title="Let's Go!"
         onPress={handleFormSubmit}
+        style={styles.submitButton}
         disabled={
           currentState.matches(FORM_STATE.invalid) ||
           currentState.matches(FORM_STATE.submitting)
@@ -132,5 +133,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderColor: '#ccc',
     padding: 8,
+  },
+  submitButton: {
+    width: 250,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
 });

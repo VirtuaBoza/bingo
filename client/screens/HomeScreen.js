@@ -1,31 +1,44 @@
 import React from 'react';
-import { Button, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Button from '../components/Button';
 import Stack from '../components/Stack';
 import Routes from '../constants/Routes';
 import { connect, initialState } from '../store';
 import { createRootResetAction } from '../store/reducers';
+import MafingoLogo from '../svg/MafingoLogo';
 
 export default connect(null, { resetStore: createRootResetAction })(HomeScreen);
 
 export function HomeScreen({ navigation, resetStore }) {
   return (
-    <Stack style={styles.container}>
+    <View style={styles.container}>
+      <View style={styles.logoContainer}>
+        <View style={[StyleSheet.absoluteFill]}>
+          <MafingoLogo />
+        </View>
+      </View>
       <Button
-        title="Start a New Game"
-        onPress={() => navigation.navigate(Routes.NewGame)}
-      />
-      <Button
-        title="Join Game"
+        style={styles.primaryButton}
+        title="Join a Game"
         onPress={() => navigation.navigate(Routes.JoinGame)}
       />
-      <Button
-        title="My Games"
-        onPress={() => navigation.navigate(Routes.Games)}
-      />
-      {__DEV__ && (
-        <Button title="Reset State" onPress={() => resetStore(initialState)} />
-      )}
-    </Stack>
+      <Stack style={styles.stack}>
+        <Button
+          title="Start a New Game"
+          onPress={() => navigation.navigate(Routes.NewGame)}
+        />
+        <Button
+          title="My Games"
+          onPress={() => navigation.navigate(Routes.Games)}
+        />
+        {__DEV__ && (
+          <Button
+            title="Reset State"
+            onPress={() => resetStore(initialState)}
+          />
+        )}
+      </Stack>
+    </View>
   );
 }
 
@@ -33,10 +46,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    justifyContent: 'center',
     padding: 20,
+    alignItems: 'stretch',
   },
-  contentContainer: {
-    paddingTop: 30,
+  logoContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  primaryButton: {
+    width: 300,
+    marginBottom: 20,
+    alignSelf: 'center',
+  },
+  stack: {
+    width: 250,
+    alignSelf: 'center',
   },
 });

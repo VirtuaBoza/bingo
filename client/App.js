@@ -9,10 +9,10 @@ import 'react-native-gesture-handler';
 import ErrorBoundary from './components/ErrorBoundary';
 import Routes from './constants/Routes';
 import useLinking from './navigation/useLinking';
+import GameLobbyScreen from './screens/GameLobbyScreen';
 import GamesScreen from './screens/GamesScreen';
 import HomeScreen from './screens/HomeScreen';
 import JoinGameScreen from './screens/JoinGameScreen';
-import LobbyScreen from './screens/LobbyScreen';
 import NewGameScreen from './screens/NewGameScreen';
 import { StoreProvider } from './store';
 
@@ -37,6 +37,8 @@ export default function App(props) {
         await Font.loadAsync({
           ...Ionicons.font,
           'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+          'Fugaz-One': require('./assets/fonts/FugazOne-Regular.ttf'),
+          'Work-Sans': require('./assets/fonts/WorkSans-Regular.ttf'),
         });
       } catch (e) {
         // We might want to provide this error information to an error reporting service
@@ -64,12 +66,23 @@ export default function App(props) {
             >
               <Stack.Navigator
                 screenOptions={{
-                  headerTitleAlign: 'center',
+                  headerTintColor: '#F38BA6',
+                  // headerTransparent: true,
+                  headerStyle: {
+                    elevation: 0,
+                    borderBottomWidth: 0,
+                    // shadowOpacity: 0,
+                  },
+                  title: '',
                 }}
               >
-                <Stack.Screen name={Routes.Home} component={HomeScreen} />
+                <Stack.Screen
+                  name={Routes.Home}
+                  component={HomeScreen}
+                  options={{ headerShown: false }}
+                />
                 <Stack.Screen name={Routes.NewGame} component={NewGameScreen} />
-                <Stack.Screen name={Routes.Lobby} component={LobbyScreen} />
+                <Stack.Screen name={Routes.Lobby} component={GameLobbyScreen} />
                 <Stack.Screen name={Routes.Games} component={GamesScreen} />
                 <Stack.Screen
                   name={Routes.JoinGame}

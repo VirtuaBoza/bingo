@@ -1,7 +1,7 @@
 const GameModel = require('../db/models/game');
 
 module.exports = {
-  get: async gameId => {
+  get: async (gameId) => {
     const gameDoc = await GameModel.findById(gameId).exec();
     return gameDoc.toObject();
   },

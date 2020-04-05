@@ -17,7 +17,9 @@ export function GamesScreen({ games, navigation }) {
         data={games}
         renderItem={({ item: game }) => (
           <TouchableOpacity onPress={() => handleGamePress(game)}>
-            <Text>{game.name}</Text>
+            <Text>
+              {game.name} ({game._id})
+            </Text>
           </TouchableOpacity>
         )}
         keyExtractor={game => game._id}

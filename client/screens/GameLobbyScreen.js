@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import gameService from '../services/gameService';
@@ -25,9 +26,14 @@ export default connect(
     setGameTerms: createSetGameTermsAction,
     updateGame: createGameCreatedAction,
   }
-)(LobbyScreen);
+)(GameLobbyScreen);
 
-export function LobbyScreen({ navigation, game, setGameTerms, updateGame }) {
+export function GameLobbyScreen({
+  navigation,
+  game,
+  setGameTerms,
+  updateGame,
+}) {
   const [newTerm, setNewTerm] = useState('');
   const [localTerms, setLocalTerms] = useState(game.terms);
   const ref = useRef();
@@ -40,7 +46,7 @@ export function LobbyScreen({ navigation, game, setGameTerms, updateGame }) {
   }, []);
 
   useEffect(() => {
-    navigation.setOptions({ title: `${game.name}` });
+    navigation.setOptions({ title: `${game.name} (${game._id})` });
     let timeout;
     timeout = setTimeout(() => {
       if (ref.current) {
@@ -73,8 +79,17 @@ export function LobbyScreen({ navigation, game, setGameTerms, updateGame }) {
     });
   }
 
+  function handlePlayersPress() {
+    console.log(game.players);
+  }
+
   return (
     <View style={styles.container}>
+      <View>
+        <TouchableOpacity onPress={handlePlayersPress}>
+          <Text>{game.players.length}</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={localTerms}
         renderItem={({ item }) => (

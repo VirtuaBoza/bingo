@@ -19,6 +19,6 @@ export default Stack;
 
 const styles = StyleSheet.create({
   child: {
-    marginBottom: 8,
+    marginBottom: 20,
   },
 });

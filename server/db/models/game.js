@@ -7,7 +7,7 @@ const gameSchema = new mongoose.Schema({
     default: shortid.generate,
   },
   name: String,
-  gameMaster: String,
+  gameMaster: { username: String, token: String },
   terms: [String],
   players: [{ username: String, token: String }],
 });

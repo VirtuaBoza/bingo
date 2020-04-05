@@ -6,10 +6,15 @@ const { apiUrl } = getEnvVars();
 const gamesRoute = `${apiUrl}/api/games`;
 
 export default {
-  createGame: (gameName, userName) => {
-    return httpClient.post(gamesRoute, { gameName, userName });
+  createGame: async (gameName, username) => {
+    let token;
+    if (Device.isDevice) {
+      token = await Notifications.getExpoPushTokenAsync();
+    }
+    console.log(gamesRoute);
+    return httpClient.post(gamesRoute, { gameName, username, token });
   },
-  getGame: gameId => {
+  getGame: (gameId) => {
     return httpClient.get(`${gamesRoute}/${encodeURIComponent(gameId)}`);
   },
   addTermToGame: (gameId, term) => {
