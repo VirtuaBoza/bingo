@@ -1,10 +1,10 @@
-import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SplashScreen } from 'expo';
 import * as Font from 'expo-font';
 import * as React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 import 'react-native-gesture-handler';
 import ErrorBoundary from './components/ErrorBoundary';
 import Routes from './constants/Routes';
@@ -35,7 +35,6 @@ export default function App(props) {
 
         // Load fonts
         await Font.loadAsync({
-          ...Ionicons.font,
           ...AntDesign.font,
           'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
           'Fugaz-One': require('./assets/fonts/FugazOne-Regular.ttf'),
@@ -59,46 +58,34 @@ export default function App(props) {
     return (
       <ErrorBoundary>
         <StoreProvider>
-          <View style={styles.container}>
-            {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
-            <NavigationContainer
-              ref={containerRef}
-              initialState={initialNavigationState}
+          {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
+          <NavigationContainer
+            ref={containerRef}
+            initialState={initialNavigationState}
+          >
+            <Stack.Navigator
+              screenOptions={{
+                headerTintColor: '#F38BA6',
+                headerStyle: {
+                  elevation: 0,
+                  borderBottomWidth: 0,
+                },
+                title: '',
+              }}
             >
-              <Stack.Navigator
-                screenOptions={{
-                  headerTintColor: '#F38BA6',
-                  headerStyle: {
-                    elevation: 0,
-                    borderBottomWidth: 0,
-                  },
-                  title: '',
-                }}
-              >
-                <Stack.Screen
-                  name={Routes.Home}
-                  component={HomeScreen}
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen name={Routes.NewGame} component={NewGameScreen} />
-                <Stack.Screen name={Routes.Lobby} component={GameLobbyScreen} />
-                <Stack.Screen name={Routes.Games} component={GamesScreen} />
-                <Stack.Screen
-                  name={Routes.JoinGame}
-                  component={JoinGameScreen}
-                />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </View>
+              <Stack.Screen
+                name={Routes.Home}
+                component={HomeScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name={Routes.NewGame} component={NewGameScreen} />
+              <Stack.Screen name={Routes.Lobby} component={GameLobbyScreen} />
+              <Stack.Screen name={Routes.Games} component={GamesScreen} />
+              <Stack.Screen name={Routes.JoinGame} component={JoinGameScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
         </StoreProvider>
       </ErrorBoundary>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-});
