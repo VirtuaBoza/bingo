@@ -1,7 +1,7 @@
-const GAMES_GAME_CREATED = 'GAMES_GAME_CREATED';
-export function createGameCreatedAction(game) {
+const GAMES_GAME_CREATED_OR_UPDATED = 'GAMES_GAME_CREATED_OR_UPDATED';
+export function createGameUpertedAction(game) {
   return {
-    type: GAMES_GAME_CREATED,
+    type: GAMES_GAME_CREATED_OR_UPDATED,
     payload: game,
   };
 }
@@ -19,9 +19,9 @@ export function createSetGameTermsAction(gameId, terms) {
 
 export const initialGamesState = {};
 
-export default function(games, { type, payload }) {
+export default function (games, { type, payload }) {
   switch (type) {
-    case GAMES_GAME_CREATED:
+    case GAMES_GAME_CREATED_OR_UPDATED:
       return { ...games, [payload._id]: payload };
     case GAMES_SET_GAME_TERMS:
       return {

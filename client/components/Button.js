@@ -1,12 +1,22 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-function Button({ title, style, onPress, disabled }) {
-  return (
-    <TouchableOpacity onPress={onPress}>
-      <View style={[styles.container, style, disabled && styles.disabled]}>
-        <Text style={styles.text}>{title}</Text>
-      </View>
+function Button({ title, style, onPress, disabled, borderless }) {
+  return borderless ? (
+    <TouchableOpacity onPress={onPress} disabled={disabled} style={style}>
+      <Text
+        style={[styles.borderlessText, disabled && styles.borderlessDisabled]}
+      >
+        {title}
+      </Text>
+    </TouchableOpacity>
+  ) : (
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled}
+      style={[styles.container, style, disabled && styles.disabled]}
+    >
+      <Text style={styles.text}>{title}</Text>
     </TouchableOpacity>
   );
 }
@@ -30,5 +40,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Fugaz-One',
     color: '#FFEEEE',
     fontSize: 17,
+  },
+  borderlessText: {
+    color: '#F38BA6',
+    fontFamily: 'Fugaz-One',
+    fontSize: 17,
+  },
+  borderlessDisabled: {
+    color: '#F7BDC9',
   },
 });

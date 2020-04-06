@@ -20,6 +20,9 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
+    },
+    "androidStatusBar": {
+      "barStyle": "light-content"
     }
   }
 }

@@ -1,8 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 
-function Label({ text }) {
-  return <Text style={styles.label}>{text}</Text>;
+function Label({ text, style, ...rest }) {
+  return (
+    <Text {...rest} style={[styles.label, style]}>
+      {text}
+    </Text>
+  );
 }
 
 export default Label;

@@ -10,10 +10,18 @@ module.exports = {
     gameDoc = await gameDoc.save();
     return gameDoc.toObject();
   },
-  addTerm: async (gameId, term) => {
-    const gameDoc = await GameModel.findByIdAndUpdate(
-      gameId,
-      { $addToSet: { terms: term } },
+  upsertTerm: async (gameId, term) => {
+    let gameDoc = await GameModel.findOneAndUpdate(
+      { _id: gameId, 'terms.id': { $ne: term.id } },
+      { $push: { terms: term } },
+      { new: true }
+    ).exec();
+    if (gameDoc) {
+      return gameDoc.toObject().terms;
+    }
+    gameDoc = await GameModel.findOneAndUpdate(
+      { _id: gameId, 'terms.id': term.id },
+      { $set: { 'terms.$.text': term.text } },
       { new: true }
     ).exec();
     if (gameDoc) {
@@ -22,8 +30,8 @@ module.exports = {
     return null;
   },
   addPlayer: async (gameId, player) => {
-    const gameDoc = await GameModel.findByIdAndUpdate(
-      gameId,
+    const gameDoc = await GameModel.findOneAndUpdate(
+      { _id: gameId, 'players.token': { $ne: player.token } },
       { $addToSet: { players: player } },
       { new: true }
     ).exec();

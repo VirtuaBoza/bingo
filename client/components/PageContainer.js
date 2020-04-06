@@ -1,8 +1,21 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 
-function PageContainer({ style, ...rest }) {
-  return <View style={[style, styles.container]} {...rest} />;
+function PageContainer({ style, children, ...rest }) {
+  return Platform.OS === 'ios' ? (
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={[style, styles.container]}
+      {...rest}
+    >
+      {children}
+      <View style={styles.bump} />
+    </KeyboardAvoidingView>
+  ) : (
+    <View style={[style, styles.container]} {...rest}>
+      {children}
+    </View>
+  );
 }
 
 export default PageContainer;
@@ -12,8 +25,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingTop: Platform.OS === 'ios' ? 20 : 0,
-    paddingRight: 20,
     paddingBottom: 20,
-    paddingLeft: 20,
+    paddingHorizontal: 20,
+  },
+  bump: {
+    height: 20,
   },
 });

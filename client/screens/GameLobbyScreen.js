@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { AntDesign } from '@expo/vector-icons';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import {
   FlatList,
   Keyboard,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -12,9 +14,10 @@ import { Button, Label, PageContainer, Title } from '../components';
 import gameService from '../services/gameService';
 import { connect, selectGameById } from '../store';
 import {
-  createGameCreatedAction,
+  createGameUpertedAction,
   createSetGameTermsAction,
 } from '../store/reducers/gamesReducer';
+import uuid from '../utils/uuid';
 
 export default connect(
   ({ route }) => {
@@ -24,14 +27,18 @@ export default connect(
   },
   {
     setGameTerms: createSetGameTermsAction,
-    updateGame: createGameCreatedAction,
+    updateGame: createGameUpertedAction,
   }
 )(GameLobbyScreen);
 
-export function GameLobbyScreen({ game, setGameTerms, updateGame }) {
-  const [newTerm, setNewTerm] = useState('');
+export function GameLobbyScreen({
+  navigation,
+  game,
+  setGameTerms,
+  updateGame,
+}) {
+  const [editingTermId, setEditingTermId] = useState(null);
   const [localTerms, setLocalTerms] = useState(game.terms);
-  const ref = useRef();
 
   useEffect(() => {
     gameService.getGame(game._id).then((game) => {
@@ -40,73 +47,186 @@ export function GameLobbyScreen({ game, setGameTerms, updateGame }) {
     });
   }, []);
 
-  useEffect(() => {
-    let timeout;
-    timeout = setTimeout(() => {
-      if (ref.current) {
-        ref.current.focus();
-      }
-    }, 1);
-
+  useLayoutEffect(() => {
     function handleKeyboardHide() {
-      setLocalTerms(localTerms.filter((t) => t.trim()));
+      setEditingTermId(null);
+      // gameService.getGame(game._id).then((game) => {
+      //   updateGame(game);
+      //   setLocalTerms(game.terms);
+      // });
     }
     Keyboard.addListener('keyboardDidHide', handleKeyboardHide);
 
     return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
       Keyboard.removeListener('keyboardDidHide', handleKeyboardHide);
     };
   });
 
-  function handleAddTermClick() {
-    setLocalTerms([...localTerms, '']);
-  }
-
-  function handleSubmitTerm() {
-    gameService.addTermToGame(game._id, newTerm.trim()).then((terms) => {
-      setGameTerms(game._id, terms);
-      setLocalTerms([...terms, '']);
-      setNewTerm('');
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Button
+          title="Start"
+          onPress={() => {}}
+          style={{ paddingRight: 20 }}
+          disabled={game.terms.length < 8}
+          borderless
+        />
+      ),
     });
+  }, [game.terms]);
+
+  function handleAddTermClick() {
+    const id = uuid();
+    setLocalTerms([...localTerms, { id, text: '' }]);
+    setEditingTermId(id);
   }
 
-  function handlePlayersPress() {
-    console.log(game.players);
+  function handleSubmitTerm(term) {
+    if (term.text.trim()) {
+      // gameService.addTermToGame(game._id, term).then((terms) => {
+      //   setGameTerms(game._id, terms);
+      //   const id = uuid();
+      //   setLocalTerms([...terms, { id, text: '' }]);
+      //   setEditingTermId(id);
+      // });
+    } else {
+      // gameService.getGame(game._id).then((game) => {
+      //   updateGame(game);
+      //   setLocalTerms(game.terms);
+      // });
+    }
   }
 
+  function handleTermPressed(term) {
+    setEditingTermId(term.id);
+  }
+
+  const readyPlayerCount = game.players.filter((player) => player.ready).length;
   return (
     <PageContainer style={styles.container}>
       <Title text={game.name} />
-      <Label text={game.players.length ? 'Players' : 'No Players'} />
-      <View>
-        <TouchableOpacity onPress={handlePlayersPress}>
-          <Text>{game.players.length}</Text>
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        data={localTerms}
-        renderItem={({ item }) => (
-          <View>
-            {item ? (
-              <Text>{item}</Text>
-            ) : (
-              <TextInput
-                value={newTerm}
-                onSubmitEditing={handleSubmitTerm}
-                onChangeText={setNewTerm}
-                ref={ref}
-                blurOnSubmit={false}
-              />
-            )}
-          </View>
-        )}
-        keyExtractor={(item) => item}
+      <Label
+        style={{ alignSelf: 'center' }}
+        text={
+          game.players.length
+            ? readyPlayerCount === game.players.length
+              ? 'All Plyers Ready!'
+              : `${readyPlayerCount}/${game.players.length} Players Ready`
+            : 'No Players'
+        }
       />
+      <View>
+        <ScrollView
+          horizontal
+          contentContainerStyle={{
+            justifyContent: 'center',
+            minWidth: '100%',
+            paddingVertical: 20,
+          }}
+        >
+          <Player />
+        </ScrollView>
+      </View>
+      <Label text="Terms" />
+      {localTerms.length && game.terms.length < 8 ? (
+        <Text style={{ fontFamily: 'Work-Sans', fontSize: 13 }}>
+          Add {`${8 - game.terms.length}`} or more terms.
+        </Text>
+      ) : null}
+      <View
+        style={{
+          marginVertical: 10,
+          flex: 1,
+        }}
+      >
+        <FlatList
+          data={localTerms}
+          renderItem={({ item }) =>
+            item.id === editingTermId ? (
+              <EditingTerm term={item} onSubmit={handleSubmitTerm} />
+            ) : (
+              <Term term={item} onPress={handleTermPressed} />
+            )
+          }
+          keyExtractor={(item) => item.id}
+          ListEmptyComponent={
+            <Text style={{ fontFamily: 'Work-Sans', fontSize: 13 }}>
+              Add at least 8 terms.
+            </Text>
+          }
+          ItemSeparatorComponent={() => <View style={styles.divider}></View>}
+          contentContainerStyle={[
+            {
+              flexGrow: 1,
+            },
+            !localTerms.length && {
+              justifyContent: 'center',
+              alignItems: 'center',
+            },
+          ]}
+          removeClippedSubviews={false}
+        />
+      </View>
       <Button title="Add Term" onPress={handleAddTermClick} />
     </PageContainer>
+  );
+}
+
+const Term = ({ term, onPress }) => {
+  function handlePress() {
+    onPress(term);
+  }
+
+  return (
+    <TouchableOpacity onPress={handlePress}>
+      <Text style={styles.term}>{term.text}</Text>
+    </TouchableOpacity>
+  );
+};
+
+const EditingTerm = ({ term, onSubmit }) => {
+  const [localTermText, setLocalTermText] = useState(term.text);
+
+  function handleSubmitTerm() {
+    onSubmit({ ...term, text: localTermText });
+  }
+
+  return (
+    <TextInput
+      value={localTermText}
+      onChangeText={setLocalTermText}
+      onSubmitEditing={handleSubmitTerm}
+      style={styles.term}
+      autoFocus
+    />
+  );
+};
+
+function Player() {
+  return (
+    <TouchableOpacity
+      onPress={() => {}}
+      style={{
+        width: 50,
+        alignItems: 'center',
+      }}
+    >
+      <View
+        style={{
+          backgroundColor: '#FDF1F1',
+          height: 32,
+          width: 32,
+          borderRadius: 50,
+        }}
+      ></View>
+      <View style={{ position: 'absolute' }}>
+        <AntDesign name="pluscircleo" size={32} color="#F38BA6" />
+      </View>
+      <Text style={{ fontFamily: 'Work-Sans', textAlign: 'center' }}>
+        Invite Players
+      </Text>
+    </TouchableOpacity>
   );
 }
 
@@ -114,14 +234,14 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'space-between',
   },
-  label: {
-    fontSize: 18,
+  term: {
+    fontFamily: 'Work-Sans',
+    fontSize: 17,
+    color: '#F38BA6',
+    padding: 10,
   },
-  input: {
-    height: 44,
-    borderWidth: 1,
-    borderRadius: 4,
-    borderColor: '#ccc',
-    padding: 8,
+  divider: {
+    height: 1,
+    backgroundColor: 'rgba(128, 128, 128, 0.2)',
   },
 });
