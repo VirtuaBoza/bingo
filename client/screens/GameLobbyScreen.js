@@ -98,19 +98,20 @@ export function GameLobbyScreen({
     }
   });
 
-  function handleAddTermClick() {
-    setShowAddButton(false);
-
+  function createNewTerm() {
     const newTerm = { key: uuid(), text: '' };
     setLocalTerms([...localTerms, newTerm]);
     setEditingTermKey(newTerm.key);
   }
 
+  function handleAddTermClick() {
+    setShowAddButton(false);
+    createNewTerm();
+  }
+
   function handleSubmitTerm(term) {
     if (term.text.trim()) {
-      const newTerm = { key: uuid(), text: '' };
-      setLocalTerms([...localTerms, newTerm]);
-      setEditingTermKey(newTerm.key);
+      createNewTerm();
       // gameService.addTermToGame(game._id, term).then((terms) => {
       //   setGameTerms(game._id, terms);
       //   const id = uuid();
@@ -118,12 +119,7 @@ export function GameLobbyScreen({
       //   setEditingTermId(id);
       // });
     } else {
-      setLocalTerms(localTerms.filter((term) => term.text.trim() || term._id));
-
-      // gameService.getGame(game._id).then((game) => {
-      //   updateGame(game);
-      //   setLocalTerms(game.terms);
-      // });
+      handleKeyboardDismissed();
     }
   }
 
