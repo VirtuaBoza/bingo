@@ -8,7 +8,7 @@ const gameSchema = new mongoose.Schema({
   },
   name: String,
   gameMaster: { username: String, token: String },
-  terms: [{ id: String, text: String }],
+  terms: [{ key: String, text: String }],
   players: [{ username: String, token: String, ready: Boolean }],
 });
 

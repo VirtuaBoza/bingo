@@ -1,7 +1,7 @@
 import { StackActions } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { Button, Input, Stack, Title } from '../components';
+import { Button, Input, PageContainer, Stack, Title } from '../components';
 import Routes from '../constants/Routes';
 import {
   FORM_EVENT,
@@ -10,12 +10,12 @@ import {
 } from '../hooks/useMachine';
 import gameService from '../services/gameService';
 import { connect, selectUser } from '../store';
-import { createGameCreatedAction } from '../store/reducers/gamesReducer';
+import { createGameUpertedAction } from '../store/reducers/gamesReducer';
 import { createSetUsernameAction } from '../store/reducers/userReducer';
 
 export default connect(() => ({ user: selectUser }), {
   setUsername: createSetUsernameAction,
-  addGame: createGameCreatedAction,
+  addGame: createGameUpertedAction,
 })(NewGameScreen);
 
 export function NewGameScreen({ user, navigation, setUsername, addGame }) {
@@ -60,9 +60,8 @@ export function NewGameScreen({ user, navigation, setUsername, addGame }) {
           );
         })
         .catch((err) => {
-          console.log(err);
           if (__DEV__) {
-            console.dir(err);
+            console.error(err);
           }
           transition(FORM_EVENT.fail);
         });
@@ -70,58 +69,58 @@ export function NewGameScreen({ user, navigation, setUsername, addGame }) {
   }
 
   return (
-    <View style={styles.container}>
-      <Stack>
-        <Title text="Start a New Game" />
-        <Input
-          label="Your Name"
-          value={internalUserName}
-          onChangeText={setInternalUserName}
-          editable={!currentState.matches(FORM_STATE.submitting)}
-          returnKeyType="next"
-          onSubmitEditing={handleUsernameSubmit}
-          blurOnSubmit={false}
-          selectTextOnFocus
-          enablesReturnKeyAutomatically
-          autoFocus
+    <PageContainer>
+      <View style={styles.container}>
+        <Stack>
+          <Title text="Start a New Game" />
+          <Input
+            label="Your Name"
+            value={internalUserName}
+            onChangeText={setInternalUserName}
+            editable={!currentState.matches(FORM_STATE.submitting)}
+            returnKeyType="next"
+            onSubmitEditing={handleUsernameSubmit}
+            blurOnSubmit={false}
+            selectTextOnFocus
+            enablesReturnKeyAutomatically
+            autoFocus
+          />
+          <Input
+            label="Game Name"
+            value={gameName}
+            onChangeText={setGameName}
+            editable={!currentState.matches(FORM_STATE.submitting)}
+            returnKeyType="go"
+            onSubmitEditing={handleFormSubmit}
+            ref={ref}
+            selectTextOnFocus
+            enablesReturnKeyAutomatically
+          />
+          <ActivityIndicator
+            animating={currentState.matches(FORM_STATE.submitting)}
+            size="large"
+          />
+          {currentState.matches(FORM_STATE.failure) && (
+            <Text>Something went wrong.</Text>
+          )}
+        </Stack>
+        <Button
+          title="Let's Go!"
+          onPress={handleFormSubmit}
+          style={styles.submitButton}
+          disabled={
+            currentState.matches(FORM_STATE.invalid) ||
+            currentState.matches(FORM_STATE.submitting)
+          }
         />
-        <Input
-          label="Game Name"
-          value={gameName}
-          onChangeText={setGameName}
-          editable={!currentState.matches(FORM_STATE.submitting)}
-          returnKeyType="go"
-          onSubmitEditing={handleFormSubmit}
-          ref={ref}
-          selectTextOnFocus
-          enablesReturnKeyAutomatically
-        />
-        <ActivityIndicator
-          animating={currentState.matches(FORM_STATE.submitting)}
-          size="large"
-        />
-        {currentState.matches(FORM_STATE.failure) && (
-          <Text>Something went wrong.</Text>
-        )}
-      </Stack>
-      <Button
-        title="Let's Go!"
-        onPress={handleFormSubmit}
-        style={styles.submitButton}
-        disabled={
-          currentState.matches(FORM_STATE.invalid) ||
-          currentState.matches(FORM_STATE.submitting)
-        }
-      />
-    </View>
+      </View>
+    </PageContainer>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
     justifyContent: 'space-between',
   },
   label: {

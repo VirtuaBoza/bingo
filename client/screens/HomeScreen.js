@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Stack } from '../components';
+import { Button, PageContainer, Stack } from '../components';
 import Routes from '../constants/Routes';
 import { connect, initialState } from '../store';
 import { createRootResetAction } from '../store/reducers';
@@ -10,7 +10,7 @@ export default connect(null, { resetStore: createRootResetAction })(HomeScreen);
 
 export function HomeScreen({ navigation, resetStore }) {
   return (
-    <View style={styles.container}>
+    <PageContainer>
       <View style={styles.logoContainer}>
         <View style={[StyleSheet.absoluteFill]}>
           <MafingoLogo />
@@ -37,17 +37,11 @@ export function HomeScreen({ navigation, resetStore }) {
           />
         )}
       </Stack>
-    </View>
+    </PageContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
-    alignItems: 'stretch',
-  },
   logoContainer: {
     flex: 1,
     alignItems: 'center',

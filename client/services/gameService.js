@@ -11,7 +11,6 @@ export default {
     if (Device.isDevice) {
       token = await Notifications.getExpoPushTokenAsync();
     }
-    console.log(gamesRoute);
     return httpClient.post(gamesRoute, { gameName, username, token });
   },
   getGame: (gameId) => {
