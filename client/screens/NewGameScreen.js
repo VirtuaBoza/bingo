@@ -10,12 +10,12 @@ import {
 } from '../hooks/useMachine';
 import gameService from '../services/gameService';
 import { connect, selectUser } from '../store';
-import { createGameUpertedAction } from '../store/reducers/gamesReducer';
+import { createGameUpsertedAction } from '../store/reducers/gamesReducer';
 import { createSetUsernameAction } from '../store/reducers/userReducer';
 
 export default connect(() => ({ user: selectUser }), {
   setUsername: createSetUsernameAction,
-  addGame: createGameUpertedAction,
+  addGame: createGameUpsertedAction,
 })(NewGameScreen);
 
 export function NewGameScreen({ user, navigation, setUsername, addGame }) {

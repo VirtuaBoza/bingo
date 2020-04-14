@@ -10,6 +10,10 @@ export function createRootResetAction(state) {
 }
 
 export default function rootReducer(state, action) {
+  if (__DEV__) {
+    console.log('oldState', state);
+    console.log('action', action);
+  }
   let newState;
   switch (action.type) {
     case ROOT_RESET:
@@ -23,9 +27,8 @@ export default function rootReducer(state, action) {
       break;
   }
   if (__DEV__) {
-    console.log('oldState', state);
-    console.log('action', action);
     console.log('newState', newState);
+    console.log('complete');
   }
   return newState;
 }

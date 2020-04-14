@@ -10,24 +10,34 @@ module.exports = {
     gameDoc = await gameDoc.save();
     return gameDoc.toObject();
   },
-  upsertTerm: async (gameId, term) => {
+  addTerm: async (gameId, term) => {
     let gameDoc = await GameModel.findOneAndUpdate(
-      { _id: gameId, 'terms.id': { $ne: term.id } },
+      { _id: gameId, 'terms.key': { $ne: term.key } },
       { $push: { terms: term } },
       { new: true }
     ).exec();
     if (gameDoc) {
-      return gameDoc.toObject().terms;
+      return gameDoc.toObject().terms.find((t) => t.key === term.key);
     }
-    gameDoc = await GameModel.findOneAndUpdate(
-      { _id: gameId, 'terms.id': term.id },
+    return null;
+  },
+  updateTerm: async (gameId, term) => {
+    let gameDoc = await GameModel.findOneAndUpdate(
+      { _id: gameId, 'terms.key': term.key },
       { $set: { 'terms.$.text': term.text } },
       { new: true }
     ).exec();
     if (gameDoc) {
-      return gameDoc.toObject().terms;
+      return gameDoc.toObject().terms.find((t) => t.key === term.key);
     }
     return null;
+  },
+  deleteTerm: async (gameId, termKey) => {
+    await GameModel.findOneAndUpdate(
+      { _id: gameId },
+      { $pull: { terms: { key: termKey } } },
+      { new: true }
+    ).exec();
   },
   addPlayer: async (gameId, player) => {
     const gameDoc = await GameModel.findOneAndUpdate(

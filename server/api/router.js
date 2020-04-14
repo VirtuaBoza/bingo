@@ -7,7 +7,10 @@ const router = express.Router();
 
 router.post('/games', gamesController.post);
 router.get('/games/:gameId', gamesController.get);
+
 router.post('/games/:gameId/terms', termsController.post);
+router.delete('/games/:gameId/terms/:termKey', termsController.delete);
+
 router.post('/games/:gameId/players', playersController.post);
 
 module.exports = router;

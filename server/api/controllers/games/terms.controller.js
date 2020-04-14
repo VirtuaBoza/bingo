@@ -3,11 +3,21 @@ const gameService = require('../../../services/game.service');
 module.exports = {
   post: async (req, res) => {
     const { gameId } = req.params;
-    const { term } = req.body;
-    const terms = await gameService.upsertTerm(gameId, term);
-    if (terms) {
-      res.json(terms);
+    let { term } = req.body;
+    if (term._id) {
+      term = await gameService.updateTerm(gameId, term);
+    } else {
+      term = await gameService.addTerm(gameId, term);
     }
-    res.status(400);
+    if (term) {
+      res.json(term);
+    } else {
+      res.status(400);
+    }
+  },
+  delete: async (req, res) => {
+    const { gameId, termKey } = req.params;
+    await gameService.deleteTerm(gameId, termKey);
+    res.status(204);
   },
 };

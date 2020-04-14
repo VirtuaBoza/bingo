@@ -16,8 +16,9 @@ import { useKeyboardEvent, usePromise } from '../hooks';
 import gameService from '../services/gameService';
 import { connect, selectGameById } from '../store';
 import {
-  createGameUpertedAction,
-  createSetGameTermsAction,
+  createGameUpsertedAction,
+  createRemoveTermAction,
+  createUpsertTermAction,
 } from '../store/reducers/gamesReducer';
 import uuid from '../utils/uuid';
 
@@ -28,21 +29,32 @@ export default connect(
     return { game: gameSelector };
   },
   {
-    setGameTerms: createSetGameTermsAction,
-    updateGame: createGameUpertedAction,
+    updateGame: createGameUpsertedAction,
+    upsertTermToGame: createUpsertTermAction,
+    removeTermFromGame: createRemoveTermAction,
   }
 )(GameLobbyScreen);
 
 export function GameLobbyScreen({
   navigation,
   game,
-  setGameTerms,
   updateGame,
+  upsertTermToGame,
+  removeTermFromGame,
 }) {
   const [editingTermKey, setEditingTermKey] = useState(null);
   const [localTerms, setLocalTerms] = useState(game.terms);
   const [showAddButton, setShowAddButton] = useState(true);
   const listRef = useRef(null);
+
+  usePromise(
+    [],
+    () => gameService.getGame(game._id),
+    (game) => {
+      updateGame(game);
+      setLocalTerms(game.terms);
+    }
+  );
 
   useLayoutEffect(() => {
     let timeout;
@@ -63,15 +75,6 @@ export function GameLobbyScreen({
     };
   });
 
-  usePromise(
-    [],
-    () => gameService.getGame(game._id),
-    (game) => {
-      updateGame(game);
-      setLocalTerms(game.terms);
-    }
-  );
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -87,6 +90,20 @@ export function GameLobbyScreen({
   }, [game.terms]);
 
   function handleKeyboardDismissed() {
+    const term = localTerms.find((term) => term.key === editingTermKey);
+    if (term) {
+      if (term.text.trim()) {
+        upsertTerm(term);
+      } else if (term._id) {
+        gameService
+          .deleteTerm(game._id, term.key)
+          .then(() => {
+            console.log('came back!');
+            removeTermFromGame(game._id, term.key);
+          })
+          .catch((err) => console.log(err));
+      }
+    }
     setEditingTermKey(null);
     setLocalTerms(localTerms.filter((term) => term.text.trim() || term._id));
     setShowAddButton(true);
@@ -110,17 +127,25 @@ export function GameLobbyScreen({
   }
 
   function handleSubmitTerm(term) {
+    console.log('handleSubmitTerm', term);
     if (term.text.trim()) {
       createNewTerm();
-      // gameService.addTermToGame(game._id, term).then((terms) => {
-      //   setGameTerms(game._id, terms);
-      //   const id = uuid();
-      //   setLocalTerms([...terms, { id, text: '' }]);
-      //   setEditingTermId(id);
-      // });
+      upsertTerm(term);
     } else {
       handleKeyboardDismissed();
     }
+  }
+
+  function upsertTerm(term) {
+    gameService
+      .upsertTerm(game._id, term)
+      .then((savedTerm) => {
+        upsertTermToGame(game._id, savedTerm);
+        setLocalTerms((term) =>
+          term.key === savedTerm.key ? savedTerm : term
+        );
+      })
+      .catch((err) => console.log(err));
   }
 
   function handleTermPressed(term) {
