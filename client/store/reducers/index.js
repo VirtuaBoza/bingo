@@ -10,7 +10,7 @@ export function createRootResetAction(state) {
 }
 
 export default function rootReducer(state, action) {
-  if (__DEV__) {
+  if (false && __DEV__) {
     console.log('oldState', state);
     console.log('action', action);
   }
@@ -26,7 +26,7 @@ export default function rootReducer(state, action) {
       })(state, action);
       break;
   }
-  if (__DEV__) {
+  if (false && __DEV__) {
     console.log('newState', newState);
     console.log('complete');
   }

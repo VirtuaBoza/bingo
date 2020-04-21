@@ -1,6 +1,6 @@
 import uuid from '../utils/uuid';
 
-const db = {};
+let db = {};
 
 class Game {
   constructor(gameName, username) {
@@ -13,6 +13,9 @@ class Game {
 }
 
 export default {
+  setGameState: (gameState) => {
+    db = gameState;
+  },
   createGame: async (gameName, username) => {
     return new Promise((resolve) => {
       const game = new Game(gameName, username);
@@ -22,6 +25,7 @@ export default {
   },
   getGame: (gameId) => {
     return new Promise((resolve) => {
+      console.log(db[gameId]);
       resolve(db[gameId]);
     });
   },

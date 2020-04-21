@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useReducer } from 'react';
 import { AppState, AsyncStorage } from 'react-native';
 import { storeKey } from '../constants/Keys';
+import mockGameService from '../services/mockGameService';
 import rootReducer, { createRootResetAction } from './reducers';
 import { initialGamesState } from './reducers/gamesReducer';
 import { initialUserState } from './reducers/userReducer';
@@ -21,12 +22,12 @@ export function selectGames(state) {
 }
 
 export function selectGameById(id) {
-  return state => state.games[id];
+  return (state) => state.games[id];
 }
 
 export function connect(mapStateToProps, mapDispatchToProps) {
-  return Component => {
-    return ownProps => {
+  return (Component) => {
+    return (ownProps) => {
       const [state, dispatch] = useContext(StoreContext);
       let storeProps = {};
       if (mapStateToProps) {
@@ -55,13 +56,18 @@ export const StoreProvider = ({ children }) => {
   const [state, dispatch] = useReducer(rootReducer, initialState);
 
   useEffect(() => {
-    AsyncStorage.getItem(storeKey).then(storedState => {
+    AsyncStorage.getItem(storeKey).then((storedState) => {
       if (storedState) {
         try {
+          const state = JSON.parse(storedState);
+
+          // TODO: remove
+          mockGameService.setGameState(state.games);
+
           dispatch(
             createRootResetAction({
               ...initialState,
-              ...JSON.parse(storedState),
+              ...state,
             })
           );
         } catch {}

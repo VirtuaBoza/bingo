@@ -90,6 +90,7 @@ export function GameLobbyScreen({
   }, [game.terms]);
 
   function handleKeyboardDismissed() {
+    console.log('handleKeyboardDismissed');
     const term = localTerms.find((term) => term.key === editingTermKey);
     if (term) {
       if (term.text.trim()) {
@@ -127,7 +128,6 @@ export function GameLobbyScreen({
   }
 
   function handleSubmitTerm(term) {
-    console.log('handleSubmitTerm', term);
     if (term.text.trim()) {
       createNewTerm();
       upsertTerm(term);
