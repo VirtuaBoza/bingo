@@ -20,6 +20,7 @@ export default {
     return httpClient.post(`${gamesRoute}/${gameId}/terms`, { term });
   },
   deleteTerm: (gameId, termKey) => {
+    console.log('called delete service on client');
     return httpClient.delete(
       `${gamesRoute}/${gameId}/terms/${encodeURIComponent(termKey)}`
     );

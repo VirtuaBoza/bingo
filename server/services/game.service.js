@@ -33,11 +33,12 @@ module.exports = {
     return null;
   },
   deleteTerm: async (gameId, termKey) => {
-    await GameModel.findOneAndUpdate(
-      { _id: gameId },
-      { $pull: { terms: { key: termKey } } },
-      { new: true }
-    ).exec();
+    console.log('delete, you bitch', gameId, termKey);
+    const gameDoc = await GameModel.findById(gameId).exec();
+    const game = gameDoc.toObject();
+    const terms = game.terms.filter((t) => t.key !== termKey);
+    gameDoc.terms = terms;
+    await gameDoc.save();
   },
   addPlayer: async (gameId, player) => {
     const gameDoc = await GameModel.findOneAndUpdate(

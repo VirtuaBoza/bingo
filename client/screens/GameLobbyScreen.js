@@ -13,7 +13,7 @@ import {
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Button, Label, PageContainer, Title } from '../components';
 import { useKeyboardEvent, usePromise } from '../hooks';
-import gameService from '../services/gameService';
+import gameService from '../services/mockGameService';
 import { connect, selectGameById } from '../store';
 import {
   createGameUpsertedAction,

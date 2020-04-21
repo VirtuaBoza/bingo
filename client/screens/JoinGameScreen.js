@@ -15,7 +15,7 @@ import {
   FORM_STATE,
   useFormStateMachine,
 } from '../hooks/useMachine';
-import gameService from '../services/gameService';
+import gameService from '../services/mockGameService';
 import { connect, selectUser } from '../store';
 import { createGameCreatedAction } from '../store/reducers/gamesReducer';
 import { createSetUsernameAction } from '../store/reducers/userReducer';

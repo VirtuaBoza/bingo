@@ -16,6 +16,7 @@ module.exports = {
     }
   },
   delete: async (req, res) => {
+    console.log('called delete endpoint');
     const { gameId, termKey } = req.params;
     await gameService.deleteTerm(gameId, termKey);
     res.status(204);
