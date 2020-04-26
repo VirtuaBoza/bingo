@@ -1,7 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-function Button({ title, style, onPress, disabled, borderless }) {
+const Button: React.FC<any> = ({
+  title,
+  style,
+  onPress,
+  disabled,
+  borderless,
+}) => {
   return borderless ? (
     <TouchableOpacity onPress={onPress} disabled={disabled} style={style}>
       <Text
@@ -19,7 +25,7 @@ function Button({ title, style, onPress, disabled, borderless }) {
       <Text style={styles.text}>{title}</Text>
     </TouchableOpacity>
   );
-}
+};
 
 export default Button;
 

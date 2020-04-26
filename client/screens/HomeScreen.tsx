@@ -6,9 +6,7 @@ import { connect, initialState } from '../store';
 import { createRootResetAction } from '../store/reducers';
 import MafingoLogo from '../svg/MafingoLogo';
 
-export default connect(null, { resetStore: createRootResetAction })(HomeScreen);
-
-export function HomeScreen({ navigation, resetStore }) {
+export const HomeScreen: React.FC<any> = ({ navigation, resetStore }) => {
   return (
     <PageContainer>
       <View style={styles.logoContainer}>
@@ -39,7 +37,9 @@ export function HomeScreen({ navigation, resetStore }) {
       </Stack>
     </PageContainer>
   );
-}
+};
+
+export default connect(null, { resetStore: createRootResetAction })(HomeScreen);
 
 const styles = StyleSheet.create({
   logoContainer: {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
-const Input = React.forwardRef(({ label, style, ...rest }, ref) => {
+const Input = React.forwardRef<any, any>(({ label, style, ...rest }, ref) => {
   return (
     <View style={[style, styles.container]}>
       <Text style={styles.label}>{label}</Text>

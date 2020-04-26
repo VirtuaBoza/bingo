@@ -1,4 +1,3 @@
-import { StackActions } from '@react-navigation/native';
 import * as Permissions from 'expo-permissions';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -9,27 +8,25 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import Routes from '../constants/Routes';
 import {
   FORM_EVENT,
   FORM_STATE,
   useFormStateMachine,
 } from '../hooks/useMachine';
-import gameService from '../services/mockGameService';
 import { connect, selectUser } from '../store';
-import { createGameCreatedAction } from '../store/reducers/gamesReducer';
+import { createGameUpsertedAction } from '../store/reducers/gamesReducer';
 import { createSetUsernameAction } from '../store/reducers/userReducer';
 
-export default connect(() => ({ user: selectUser }), {
-  setUsername: createSetUsernameAction,
-  addGame: createGameCreatedAction,
-})(JoinGameScreen);
-
-export function JoinGameScreen({ user, addGame, setUsername, navigation }) {
+export const JoinGameScreen: React.FC<any> = ({
+  user,
+  // addGame,
+  setUsername,
+  // navigation,
+}) => {
   const [code, setCode] = useState('');
   const [userName, setUserName] = useState(user.username || '');
   const [currentState, transition] = useFormStateMachine();
-  const ref = useRef();
+  const ref = useRef<any>();
 
   useEffect(() => {
     if (code.length && userName.length) {
@@ -51,11 +48,12 @@ export function JoinGameScreen({ user, addGame, setUsername, navigation }) {
         alert('You will not be able to play without notifications.');
       } else {
         try {
-          const game = await gameService.joinGame(code, userName);
-          addGame(game);
-          navigation.dispatch(
-            StackActions.replace(Routes.Lobby, { gameId: game._id })
-          );
+          // TODO
+          // const game = await gameService.joinGame(code, userName);
+          // addGame(game);
+          // navigation.dispatch(
+          //   StackActions.replace(Routes.Lobby, { gameId: game.id })
+          // );
         } catch (err) {
           if (__DEV__) {
             console.log(err);
@@ -116,7 +114,12 @@ export function JoinGameScreen({ user, addGame, setUsername, navigation }) {
       />
     </View>
   );
-}
+};
+
+export default connect(() => ({ user: selectUser }), {
+  setUsername: createSetUsernameAction,
+  addGame: createGameUpsertedAction,
+})(JoinGameScreen);
 
 const styles = StyleSheet.create({
   container: {

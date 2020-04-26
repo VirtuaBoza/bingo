@@ -1,13 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 
-function Label({ text, style, ...rest }) {
+const Label: React.FC<any> = ({ text, style, ...rest }) => {
   return (
     <Text {...rest} style={[styles.label, style]}>
       {text}
     </Text>
   );
-}
+};
 
 export default Label;
 

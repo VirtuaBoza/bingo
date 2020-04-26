@@ -13,15 +13,15 @@ import { connect, selectUser } from '../store';
 import { createGameUpsertedAction } from '../store/reducers/gamesReducer';
 import { createSetUsernameAction } from '../store/reducers/userReducer';
 
-export default connect(() => ({ user: selectUser }), {
-  setUsername: createSetUsernameAction,
-  addGame: createGameUpsertedAction,
-})(NewGameScreen);
-
-export function NewGameScreen({ user, navigation, setUsername, addGame }) {
+export const NewGameScreen: React.FC<any> = ({
+  user,
+  navigation,
+  setUsername,
+  addGame,
+}) => {
   const [gameName, setGameName] = useState('');
   const [internalUserName, setInternalUserName] = useState(user.username || '');
-  const ref = useRef();
+  const ref = useRef<any>();
   const [currentState, transition] = useFormStateMachine();
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export function NewGameScreen({ user, navigation, setUsername, addGame }) {
         .then((game) => {
           addGame(game);
           navigation.dispatch(
-            StackActions.replace(Routes.Lobby, { gameId: game._id })
+            StackActions.replace(Routes.Lobby, { gameId: game.id })
           );
         })
         .catch((err) => {
@@ -116,7 +116,12 @@ export function NewGameScreen({ user, navigation, setUsername, addGame }) {
       </View>
     </PageContainer>
   );
-}
+};
+
+export default connect(() => ({ user: selectUser }), {
+  setUsername: createSetUsernameAction,
+  addGame: createGameUpsertedAction,
+})(NewGameScreen);
 
 const styles = StyleSheet.create({
   container: {

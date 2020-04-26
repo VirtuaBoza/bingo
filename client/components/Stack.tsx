@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-function Stack({ children, style, ...rest }) {
+const Stack: React.FC<any> = ({ children, style, ...rest }) => {
   return (
     <View style={style} {...rest}>
       {React.Children.map(children, (child, i) =>
@@ -13,7 +13,7 @@ function Stack({ children, style, ...rest }) {
       )}
     </View>
   );
-}
+};
 
 export default Stack;
 

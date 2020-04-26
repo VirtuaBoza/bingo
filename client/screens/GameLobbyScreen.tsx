@@ -13,6 +13,7 @@ import {
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Button, Label, PageContainer, Title } from '../components';
 import { useKeyboardEvent, usePromise } from '../hooks';
+import { Game, Term } from '../models';
 import gameService from '../services/mockGameService';
 import { connect, selectGameById } from '../store';
 import {
@@ -22,34 +23,27 @@ import {
 } from '../store/reducers/gamesReducer';
 import uuid from '../utils/uuid';
 
-export default connect(
-  ({ route }) => {
-    const { gameId } = route.params;
-    const gameSelector = selectGameById(gameId);
-    return { game: gameSelector };
-  },
-  {
-    updateGame: createGameUpsertedAction,
-    upsertTermToGame: createUpsertTermAction,
-    removeTermFromGame: createRemoveTermAction,
-  }
-)(GameLobbyScreen);
-
-export function GameLobbyScreen({
+export const GameLobbyScreen: React.FC<{
+  navigation: any;
+  game: Game;
+  updateGame: any;
+  upsertTermToGame: any;
+  removeTermFromGame: any;
+}> = ({
   navigation,
   game,
   updateGame,
   upsertTermToGame,
   removeTermFromGame,
-}) {
-  const [editingTermKey, setEditingTermKey] = useState(null);
-  const [localTerms, setLocalTerms] = useState(game.terms);
+}) => {
+  const [editingTermKey, setEditingTermKey] = useState<string | null>(null);
+  const [localTerms, setLocalTerms] = useState<Term[]>(game.terms);
   const [showAddButton, setShowAddButton] = useState(true);
-  const listRef = useRef(null);
+  const listRef = useRef<any>(null);
 
   usePromise(
     [],
-    () => gameService.getGame(game._id),
+    () => gameService.getGame(game.id),
     (game) => {
       updateGame(game);
       setLocalTerms(game.terms);
@@ -57,13 +51,13 @@ export function GameLobbyScreen({
   );
 
   useLayoutEffect(() => {
-    let timeout;
+    let timeout = 0;
     if (Platform.OS === 'ios') {
       timeout = setTimeout(() => {
         if (listRef.current && editingTermKey) {
-          const item = localTerms.find((t) => t.key === editingTermKey);
+          const item = localTerms.find((t) => t.id === editingTermKey);
           if (item) {
-            listRef.current.scrollToItem({ animated: false, item });
+            listRef.current!.scrollToItem({ animated: false, item });
           }
         }
       }, 100);
@@ -90,15 +84,15 @@ export function GameLobbyScreen({
   }, [game.terms]);
 
   function handleKeyboardDismissed() {
-    const term = localTerms.find((term) => term.key === editingTermKey);
+    const term = localTerms.find((term) => term.id === editingTermKey);
     if (term) {
       if (term.text.trim()) {
         upsertTerm(term);
-      } else if (term._id) {
+      } else if (term.id) {
         gameService
-          .deleteTerm(game._id, term.key)
+          .deleteTerm(game.id, term.id)
           .then(() => {
-            removeTermFromGame(game._id, term.key);
+            removeTermFromGame(game.id, term.id);
           })
           .catch((err) => console.log(err));
       }
@@ -115,9 +109,9 @@ export function GameLobbyScreen({
   });
 
   function createNewTerm() {
-    const newTerm = { key: uuid(), text: '' };
+    const newTerm = { id: uuid(), text: '' } as Term;
     setLocalTerms([...localTerms, newTerm]);
-    setEditingTermKey(newTerm.key);
+    setEditingTermKey(newTerm.id);
   }
 
   function handleAddTermClick() {
@@ -125,7 +119,7 @@ export function GameLobbyScreen({
     createNewTerm();
   }
 
-  function handleSubmitTerm(term) {
+  function handleSubmitTerm(term: Term) {
     if (term.text.trim()) {
       createNewTerm();
       upsertTerm(term);
@@ -134,26 +128,23 @@ export function GameLobbyScreen({
     }
   }
 
-  function upsertTerm(term) {
+  function upsertTerm(term: Term) {
     gameService
-      .upsertTerm(game._id, term)
+      .upsertTerm(game.id, term)
       .then((savedTerm) => {
-        upsertTermToGame(game._id, savedTerm);
-        setLocalTerms((term) =>
-          term.key === savedTerm.key ? savedTerm : term
-        );
+        upsertTermToGame(game.id, savedTerm);
       })
       .catch((err) => console.log(err));
   }
 
-  function handleTermPressed(term) {
+  function handleTermPressed(term: Term) {
     setShowAddButton(false);
-    setEditingTermKey(term.key);
+    setEditingTermKey(term.id);
   }
 
-  function handleEditingTermTextChange(text) {
+  function handleEditingTermTextChange(text: string) {
     setLocalTerms(
-      localTerms.map((t) => (t.key === editingTermKey ? { ...t, text } : t))
+      localTerms.map((t) => (t.id === editingTermKey ? { ...t, text } : t))
     );
   }
 
@@ -163,17 +154,18 @@ export function GameLobbyScreen({
     }
   }
 
-  const readyPlayerCount = game.players.filter((player) => player.ready).length;
+  const readyPlayerCount = game.game_players.filter((player) => player.ready)
+    .length;
   return (
     <PageContainer>
       <Title text={game.name} />
       <Label
         style={{ alignSelf: 'center' }}
         text={
-          game.players.length
-            ? readyPlayerCount === game.players.length
+          game.game_players.length
+            ? readyPlayerCount === game.game_players.length
               ? 'All Plyers Ready!'
-              : `${readyPlayerCount}/${game.players.length} Players Ready`
+              : `${readyPlayerCount}/${game.game_players.length} Players Ready`
             : 'No Players'
         }
       />
@@ -203,14 +195,14 @@ export function GameLobbyScreen({
         <View style={{ flex: 1, paddingVertical: 10 }}>
           <SwipeListView
             listViewRef={(ref) => (listRef.current = ref)}
-            getItemLayout={(data, index) => ({
+            getItemLayout={(data: any, index: any) => ({
               length: LIST_ITEM_HEIGHT,
               offset: LIST_ITEM_HEIGHT * index,
               index,
             })}
             data={localTerms}
             renderItem={({ item: term }) =>
-              term.key === editingTermKey ? (
+              term.id === editingTermKey ? (
                 <EditingTerm
                   term={term}
                   onSubmit={handleSubmitTerm}
@@ -218,7 +210,7 @@ export function GameLobbyScreen({
                   onBlur={handleEditingTermBlur}
                 />
               ) : (
-                <Term term={term} onPress={handleTermPressed} />
+                <ReadonlyTerm term={term} onPress={handleTermPressed} />
               )
             }
             ListEmptyComponent={
@@ -249,10 +241,23 @@ export function GameLobbyScreen({
       </View>
     </PageContainer>
   );
-}
+};
 
-const Term = React.memo(
-  React.forwardRef(({ term, onPress }, ref) => {
+export default connect(
+  ({ route }) => {
+    const { gameId } = route.params;
+    const gameSelector = selectGameById(gameId);
+    return { game: gameSelector };
+  },
+  {
+    updateGame: createGameUpsertedAction,
+    upsertTermToGame: createUpsertTermAction,
+    removeTermFromGame: createRemoveTermAction,
+  }
+)(GameLobbyScreen);
+
+const ReadonlyTerm = React.memo<any>(
+  React.forwardRef<any, any>(({ term, onPress }, ref) => {
     function handlePress() {
       onPress(term);
     }
@@ -268,10 +273,10 @@ const Term = React.memo(
   ({ term: prevTerm }, { term: nextTerm }) => prevTerm.key === nextTerm.key
 );
 
-const EditingTerm = React.forwardRef(
+const EditingTerm = React.forwardRef<any, any>(
   ({ term, onSubmit, onChange, onBlur }, ref) => {
-    const externalRef = ref;
-    const myRef = React.useRef();
+    const externalRef = ref as any;
+    const myRef = React.useRef<any>();
     useLayoutEffect(() => {
       if (myRef.current) {
         myRef.current.focus();
@@ -292,7 +297,7 @@ const EditingTerm = React.forwardRef(
         style={[styles.termContainer, styles.term]}
         ref={(ref) => {
           myRef.current = ref;
-          externalRef.current = ref;
+          externalRef!.current = ref;
         }}
       />
     );

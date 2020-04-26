@@ -2,13 +2,12 @@ import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Routes from '../constants/Routes';
+import { Game } from '../models';
 import { connect, selectGames } from '../store';
 
-export default connect(() => ({ games: selectGames }))(GamesScreen);
-
-export function GamesScreen({ games, navigation }) {
-  function handleGamePress(game) {
-    navigation.navigate(Routes.Lobby, { gameId: game._id });
+export const GamesScreen: React.FC<any> = ({ games, navigation }) => {
+  function handleGamePress(game: Game) {
+    navigation.navigate(Routes.Lobby, { gameId: game.id });
   }
 
   return (
@@ -22,11 +21,13 @@ export function GamesScreen({ games, navigation }) {
             </Text>
           </TouchableOpacity>
         )}
-        keyExtractor={game => game._id}
+        keyExtractor={(game) => game._id}
       />
     </View>
   );
-}
+};
+
+export default connect(() => ({ games: selectGames }))(GamesScreen);
 
 const styles = StyleSheet.create({
   container: {

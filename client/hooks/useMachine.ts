@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { interpret, Machine } from 'xstate';
 
-export default function useMachine(chart) {
+export default function useMachine(chart: any) {
   const [initialChart] = useState(chart);
 
   if (JSON.stringify(chart) !== JSON.stringify(initialChart)) {
@@ -17,7 +17,7 @@ export default function useMachine(chart) {
 
   useEffect(() => {
     service
-      .onTransition(currentState => {
+      .onTransition((currentState: any) => {
         if (currentState.changed) {
           setState(currentState);
         }
@@ -30,8 +30,8 @@ export default function useMachine(chart) {
   return [state, service.send];
 }
 
-function useSingleton(fn) {
-  const ref = useRef();
+function useSingleton(fn: any) {
+  const ref = useRef<any>();
 
   if (!ref.current) {
     ref.current = { v: fn() };
@@ -54,7 +54,7 @@ export const FORM_EVENT = {
   fail: 'fail',
 };
 
-export const useFormStateMachine = initialState =>
+export const useFormStateMachine = (initialState?: any) =>
   useMachine({
     id: 'formStateMachine',
     initial: initialState || FORM_STATE.invalid,

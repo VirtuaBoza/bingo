@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 
-export default function usePromise(
-  watchlist,
-  promiseCreator,
-  handleSuccess,
-  handleFailure
+export default function usePromise<T>(
+  watchlist: any[],
+  promiseCreator: () => Promise<T>,
+  handleSuccess: (res: T) => any,
+  handleFailure?: (err: any) => any
 ) {
   useEffect(() => {
-    let ignoreResponse;
+    let ignoreResponse = false;
     promiseCreator()
       .then((res) => {
         if (!ignoreResponse && handleSuccess) {
