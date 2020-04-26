@@ -90,7 +90,6 @@ export function GameLobbyScreen({
   }, [game.terms]);
 
   function handleKeyboardDismissed() {
-    console.log('handleKeyboardDismissed');
     const term = localTerms.find((term) => term.key === editingTermKey);
     if (term) {
       if (term.text.trim()) {
@@ -99,14 +98,13 @@ export function GameLobbyScreen({
         gameService
           .deleteTerm(game._id, term.key)
           .then(() => {
-            console.log('came back!');
             removeTermFromGame(game._id, term.key);
           })
           .catch((err) => console.log(err));
       }
     }
     setEditingTermKey(null);
-    setLocalTerms(localTerms.filter((term) => term.text.trim() || term._id));
+    setLocalTerms(localTerms.filter((term) => term.text.trim()));
     setShowAddButton(true);
   }
 

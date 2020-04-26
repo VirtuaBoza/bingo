@@ -1,0 +1,6 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: CREATE TRIGGER trigger_games_genid BEFORE INSERT ON games FOR EACH ROW EXECUTE
+      PROCEDURE unique_short_id();
+  type: run_sql

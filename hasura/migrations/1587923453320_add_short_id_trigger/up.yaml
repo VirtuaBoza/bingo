@@ -1,0 +1,30 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: "CREATE OR REPLACE FUNCTION unique_short_id()\r\nRETURNS TRIGGER AS $$\r\n\r\n
+      -- Declare the variables we'll be using.\r\nDECLARE\r\n  key TEXT;\r\n  qry
+      TEXT;\r\n  found TEXT;\r\nBEGIN\r\n\r\n  -- generate the first part of a query
+      as a string with safely\r\n  -- escaped table name, using || to concat the parts\r\n
+      \ qry := 'SELECT id FROM ' || quote_ident(TG_TABLE_NAME) || ' WHERE id=';\r\n\r\n
+      \ -- This loop will probably only run once per call until we've generated\r\n
+      \ -- millions of ids.\r\n  LOOP\r\n\r\n    -- Generate our string bytes and
+      re-encode as a base64 string.\r\n    key := encode(gen_random_bytes(6), 'base64');\r\n\r\n
+      \   -- Base64 encoding contains 2 URL unsafe characters by default.\r\n    --
+      The URL-safe version has these replacements.\r\n    key := replace(key, '/',
+      '_'); -- url safe replacement\r\n    key := replace(key, '+', '-'); -- url safe
+      replacement\r\n\r\n    -- Concat the generated key (safely quoted) with the
+      generated query\r\n    -- and run it.\r\n    -- SELECT id FROM \"test\" WHERE
+      id='blahblah' INTO found\r\n    -- Now \"found\" will be the duplicated id or
+      NULL.\r\n    EXECUTE qry || quote_literal(key) INTO found;\r\n\r\n    -- Check
+      to see if found is NULL.\r\n    -- If we checked to see if found = NULL it would
+      always be FALSE\r\n    -- because (NULL = NULL) is always FALSE.\r\n    IF found
+      IS NULL THEN\r\n\r\n      -- If we didn't find a collision then leave the LOOP.\r\n
+      \     EXIT;\r\n    END IF;\r\n\r\n    -- We haven't EXITed yet, so return to
+      the top of the LOOP\r\n    -- and try again.\r\n  END LOOP;\r\n\r\n  -- NEW
+      and OLD are available in TRIGGER PROCEDURES.\r\n  -- NEW is the mutated row
+      that will actually be INSERTed.\r\n  -- We're replacing id, regardless of what
+      it was before\r\n  -- with our key variable.\r\n  NEW.id = key;\r\n\r\n  --
+      The RECORD returned here is what will actually be INSERTed,\r\n  -- or what
+      the next trigger will get if there is one.\r\n  RETURN NEW;\r\nEND;\r\n$$ language
+      'plpgsql';"
+  type: run_sql

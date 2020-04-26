@@ -1,0 +1,12 @@
+- args:
+    name: terms
+    table:
+      name: games
+      schema: public
+    using:
+      foreign_key_constraint_on:
+        column: game_id
+        table:
+          name: terms
+          schema: public
+  type: create_array_relationship

@@ -1,0 +1,5 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+  type: run_sql

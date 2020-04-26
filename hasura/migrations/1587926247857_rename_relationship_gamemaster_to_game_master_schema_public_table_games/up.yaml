@@ -1,0 +1,7 @@
+- args:
+    name: gamemaster
+    new_name: game_master
+    table:
+      name: games
+      schema: public
+  type: rename_relationship

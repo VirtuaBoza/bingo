@@ -1,0 +1,2 @@
+endpoint: https://mafingo.herokuapp.com
+admin-secret: HASURA_GRAPHQL_ADMIN_SECRET

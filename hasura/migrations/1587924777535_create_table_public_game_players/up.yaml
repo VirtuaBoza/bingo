@@ -1,0 +1,13 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: CREATE TABLE "public"."game_players"("game_id" text NOT NULL, "player_id"
+      uuid NOT NULL, "ready" boolean NOT NULL DEFAULT false, PRIMARY KEY ("game_id","player_id")
+      , FOREIGN KEY ("game_id") REFERENCES "public"."games"("id") ON UPDATE restrict
+      ON DELETE cascade, FOREIGN KEY ("player_id") REFERENCES "public"."players"("id")
+      ON UPDATE restrict ON DELETE cascade);
+  type: run_sql
+- args:
+    name: game_players
+    schema: public
+  type: add_existing_table_or_view
