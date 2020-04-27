@@ -1,6 +1,6 @@
 import Game from '../../models/Game.model';
 import Term from '../../models/Term.model';
-import Action from './Action.model';
+import Action from '../Action.model';
 
 const GAMES_GAME_CREATED_OR_UPDATED = 'GAMES_GAME_CREATED_OR_UPDATED';
 export function createGameUpsertedAction(game: Game): Action<{ game: Game }> {
@@ -43,14 +43,17 @@ export interface GamesState {
 }
 export const initialGamesState: GamesState = {};
 
-export default function (games: GamesState, { type, payload }: Action<any>) {
+export function gamesReducer(
+  games: GamesState,
+  { type, payload }: Action<any>
+): GamesState {
   switch (type) {
     case GAMES_GAME_CREATED_OR_UPDATED: {
-      const { game } = payload;
-      return { ...games, [game._id]: game };
+      const { game } = payload as { game: Game };
+      return { ...games, [game.id]: game };
     }
     case GAMES_UPSERT_TERM_TO_GAME: {
-      const { gameId, term } = payload;
+      const { gameId, term } = payload as { gameId: string; term: Term };
       return {
         ...games,
         [gameId]: {
@@ -60,7 +63,7 @@ export default function (games: GamesState, { type, payload }: Action<any>) {
       };
     }
     case GAMES_REMOVE_TERM_FROM_GAME: {
-      const { gameId, termId } = payload;
+      const { gameId, termId } = payload as { gameId: string; termId: string };
       return {
         ...games,
         [gameId]: {

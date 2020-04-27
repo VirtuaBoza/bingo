@@ -15,12 +15,12 @@ import {
 } from '../hooks/useMachine';
 import { connect, selectUser } from '../store';
 import { createGameUpsertedAction } from '../store/reducers/gamesReducer';
-import { createSetUsernameAction } from '../store/reducers/userReducer';
+import { createSetUserAction } from '../store/reducers/userReducer';
 
 export const JoinGameScreen: React.FC<any> = ({
   user,
   // addGame,
-  setUsername,
+  setUser,
   // navigation,
 }) => {
   const [code, setCode] = useState('');
@@ -41,7 +41,7 @@ export const JoinGameScreen: React.FC<any> = ({
       currentState.matches(FORM_STATE.valid) ||
       currentState.matches(FORM_STATE.failure)
     ) {
-      setUsername(userName);
+      setUser(userName);
       transition(FORM_EVENT.submit);
       const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
       if (status !== 'granted') {
@@ -117,7 +117,7 @@ export const JoinGameScreen: React.FC<any> = ({
 };
 
 export default connect(() => ({ user: selectUser }), {
-  setUsername: createSetUsernameAction,
+  setUser: createSetUserAction,
   addGame: createGameUpsertedAction,
 })(JoinGameScreen);
 

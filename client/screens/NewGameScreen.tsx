@@ -8,17 +8,18 @@ import {
   FORM_STATE,
   useFormStateMachine,
 } from '../hooks/useMachine';
-import gameService from '../services/mockGameService';
+import { User } from '../models';
+import { gameService, userService } from '../services';
 import { connect, selectUser } from '../store';
 import { createGameUpsertedAction } from '../store/reducers/gamesReducer';
-import { createSetUsernameAction } from '../store/reducers/userReducer';
+import { createSetUserAction } from '../store/reducers/userReducer';
 
-export const NewGameScreen: React.FC<any> = ({
-  user,
-  navigation,
-  setUsername,
-  addGame,
-}) => {
+export const NewGameScreen: React.FC<{
+  user: User;
+  navigation: any;
+  setUser: any;
+  addGame: any;
+}> = ({ user, navigation, setUser, addGame }) => {
   const [gameName, setGameName] = useState('');
   const [internalUserName, setInternalUserName] = useState(user.username || '');
   const ref = useRef<any>();
@@ -44,27 +45,46 @@ export const NewGameScreen: React.FC<any> = ({
     ref.current.focus();
   }
 
+  function createGame(gameName: string, userId: string) {
+    gameService
+      .createGame(gameName, userId)
+      .then((game) => {
+        addGame(game);
+        navigation.dispatch(
+          StackActions.replace(Routes.Lobby, { gameId: game.id })
+        );
+      })
+      .catch((err) => {
+        if (__DEV__) {
+          console.error(err);
+        }
+        transition(FORM_EVENT.fail);
+      });
+  }
+
   function handleFormSubmit() {
     if (
       !currentState.matches(FORM_STATE.invalid) &&
       !currentState.matches(FORM_STATE.submitting)
     ) {
-      setUsername(internalUserName);
       transition(FORM_EVENT.submit);
-      gameService
-        .createGame(gameName, internalUserName)
-        .then((game) => {
-          addGame(game);
-          navigation.dispatch(
-            StackActions.replace(Routes.Lobby, { gameId: game.id })
-          );
-        })
-        .catch((err) => {
-          if (__DEV__) {
-            console.error(err);
-          }
-          transition(FORM_EVENT.fail);
-        });
+
+      if (!user.id) {
+        userService
+          .addUser(internalUserName)
+          .then((user) => {
+            setUser(user);
+            createGame(gameName, user.id);
+          })
+          .catch((err) => {
+            if (__DEV__) {
+              console.error(err);
+            }
+            transition(FORM_EVENT.fail);
+          });
+      } else {
+        createGame(gameName, user.id);
+      }
     }
   }
 
@@ -119,7 +139,7 @@ export const NewGameScreen: React.FC<any> = ({
 };
 
 export default connect(() => ({ user: selectUser }), {
-  setUsername: createSetUsernameAction,
+  setUser: createSetUserAction,
   addGame: createGameUpsertedAction,
 })(NewGameScreen);
 
@@ -127,9 +147,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-  },
-  label: {
-    fontSize: 18,
   },
   input: {
     height: 44,

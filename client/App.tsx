@@ -18,7 +18,7 @@ import { StoreProvider } from './store';
 
 const Stack = createStackNavigator();
 
-export default function App(props) {
+export default function App(props: any) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
   const [initialNavigationState, setInitialNavigationState] = React.useState();
   const containerRef = React.useRef();
@@ -31,7 +31,7 @@ export default function App(props) {
         SplashScreen.preventAutoHide();
 
         // Load our initial navigation state
-        setInitialNavigationState(await getInitialState());
+        setInitialNavigationState((await getInitialState()) as any);
 
         // Load fonts
         await Font.loadAsync({

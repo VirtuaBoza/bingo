@@ -14,7 +14,7 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import { Button, Label, PageContainer, Title } from '../components';
 import { useKeyboardEvent, usePromise } from '../hooks';
 import { Game, Term } from '../models';
-import gameService from '../services/mockGameService';
+import { gameService } from '../services';
 import { connect, selectGameById } from '../store';
 import {
   createGameUpsertedAction,
@@ -44,14 +44,15 @@ export const GameLobbyScreen: React.FC<{
   usePromise(
     [],
     () => gameService.getGame(game.id),
-    (game) => {
-      updateGame(game);
-      setLocalTerms(game.terms);
+    (returnedGame) => {
+      console.log('loaded game', returnedGame);
+      updateGame(returnedGame);
+      setLocalTerms(returnedGame.terms);
     }
   );
 
   useLayoutEffect(() => {
-    let timeout = 0;
+    let timeout: NodeJS.Timeout;
     if (Platform.OS === 'ios') {
       timeout = setTimeout(() => {
         if (listRef.current && editingTermKey) {
@@ -132,7 +133,9 @@ export const GameLobbyScreen: React.FC<{
     gameService
       .upsertTerm(game.id, term)
       .then((savedTerm) => {
-        upsertTermToGame(game.id, savedTerm);
+        if (savedTerm) {
+          upsertTermToGame(game.id, term);
+        }
       })
       .catch((err) => console.log(err));
   }

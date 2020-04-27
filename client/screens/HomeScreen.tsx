@@ -2,8 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, PageContainer, Stack } from '../components';
 import Routes from '../constants/Routes';
-import { connect, initialState } from '../store';
-import { createRootResetAction } from '../store/reducers';
+import { connect, createRootResetAction, initialState } from '../store';
 import MafingoLogo from '../svg/MafingoLogo';
 
 export const HomeScreen: React.FC<any> = ({ navigation, resetStore }) => {

@@ -13,16 +13,16 @@ const Input = React.forwardRef<any, any>(({ label, style, ...rest }, ref) => {
 export default Input;
 
 const styles = StyleSheet.create({
-  container: {
-    fontSize: 17,
-  },
+  container: {},
   label: {
+    fontSize: 17,
     fontFamily: 'Fugaz-One',
     color: '#F38BA6',
     paddingLeft: 16,
     paddingRight: 16,
   },
   input: {
+    fontSize: 17,
     fontFamily: 'Work-Sans',
     borderRadius: 50,
     borderColor: '#F38BA6',
