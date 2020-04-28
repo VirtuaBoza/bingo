@@ -19,9 +19,6 @@ export default new ApolloClient({
     new HttpLink({
       uri: getEnvVars()?.apiUrl,
       credentials: 'same-origin',
-      headers: {
-        'x-hasura-admin-secret': getEnvVars()?.apiKey,
-      },
     }),
   ]),
   cache: new InMemoryCache(),
