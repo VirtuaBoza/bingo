@@ -76,7 +76,7 @@ export default {
         return res.data.games_by_pk;
       });
   },
-  upsertTerm: (gameId: string, term: Term): Promise<number> => {
+  upsertTerm: (gameId: string, term: Term): Promise<boolean> => {
     return client
       .mutate({
         variables: { id: term.id, text: term.text, gameId },
@@ -97,10 +97,10 @@ export default {
       })
       .then((res) => {
         if (res.errors) throw res.errors;
-        return res.data.insert_terms.affected_rows;
+        return Boolean(res.data.insert_terms.affected_rows);
       });
   },
-  deleteTerm: (gameId: string, id: string): Promise<number> => {
+  deleteTerm: (gameId: string, id: string): Promise<boolean> => {
     return client
       .mutate({
         variables: { id, gameId },
@@ -116,17 +116,30 @@ export default {
       })
       .then((res) => {
         if (res.errors) throw res.errors;
-        return res.data.delete_terms.affected_rows;
+        return Boolean(res.data.delete_terms.affected_rows);
       });
   },
-  // joinGame: async (gameId, username) => {
-  //   let token;
-  //   if (Device.isDevice) {
-  //     token = await Notifications.getExpoPushTokenAsync();
-  //   }
-  //   return httpClient.post(`${gamesRoute}/${gameId}/players`, {
-  //     username,
-  //     token,
-  //   });
-  // },
+  joinGame: async (gameId: string, userId: string): Promise<Game> => {
+    return client
+      .mutate({
+        variables: { gameId, userId },
+        mutation: gql`
+          mutation JoinGame($gameId: String!, $userId: uuid!) {
+            insert_game_players(
+              objects: { game_id: $gameId, player_id: $userId, ready: false },
+              on_conflict: {constraint: game_players_pkey, update_columns: ready}
+            ) {
+              affected_rows
+              returning {
+                game ${GAME}
+              }
+            }
+          }
+        `,
+      })
+      .then((res) => {
+        if (res.errors) throw res.errors;
+        return res.data.insert_game_players.returning[0].game;
+      });
+  },
 };

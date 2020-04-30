@@ -148,13 +148,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
   },
-  input: {
-    height: 44,
-    borderWidth: 1,
-    borderRadius: 4,
-    borderColor: '#ccc',
-    padding: 8,
-  },
   submitButton: {
     width: 250,
     alignSelf: 'center',

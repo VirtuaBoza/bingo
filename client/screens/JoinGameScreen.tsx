@@ -1,40 +1,59 @@
-import * as Permissions from 'expo-permissions';
+import { StackActions } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  Button,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { Button, Input, PageContainer, Stack, Title } from '../components';
+import Routes from '../constants/Routes';
 import {
   FORM_EVENT,
   FORM_STATE,
   useFormStateMachine,
 } from '../hooks/useMachine';
+import { gameService, userService } from '../services';
 import { connect, selectUser } from '../store';
 import { createGameUpsertedAction } from '../store/reducers/gamesReducer';
 import { createSetUserAction } from '../store/reducers/userReducer';
 
 export const JoinGameScreen: React.FC<any> = ({
   user,
-  // addGame,
+  addGame,
   setUser,
-  // navigation,
+  navigation,
 }) => {
-  const [code, setCode] = useState('');
+  const [gameId, setGameId] = useState('');
   const [userName, setUserName] = useState(user.username || '');
   const [currentState, transition] = useFormStateMachine();
   const ref = useRef<any>();
 
   useEffect(() => {
-    if (code.length && userName.length) {
+    if (userName) {
+      setTimeout(() => {
+        ref.current.focus();
+      }, 1);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (gameId.length && userName.length) {
       transition(FORM_EVENT.validate);
     } else {
       transition(FORM_EVENT.invalidate);
     }
   });
+
+  async function joinGame(gameId: string, userId: string) {
+    try {
+      const game = await gameService.joinGame(gameId, userId);
+      addGame(game);
+      navigation.dispatch(
+        StackActions.replace(Routes.Lobby, { gameId: game.id })
+      );
+    } catch (err) {
+      if (__DEV__) {
+        console.log(err);
+      }
+      transition(FORM_EVENT.fail);
+    }
+  }
 
   async function handleFormSubmit() {
     if (
@@ -43,23 +62,21 @@ export const JoinGameScreen: React.FC<any> = ({
     ) {
       setUser(userName);
       transition(FORM_EVENT.submit);
-      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-      if (status !== 'granted') {
-        alert('You will not be able to play without notifications.');
+      if (!user.id) {
+        userService
+          .addUser(userName)
+          .then((user) => {
+            setUser(user);
+            joinGame(gameId, user.id);
+          })
+          .catch((err) => {
+            if (__DEV__) {
+              console.error(err);
+            }
+            transition(FORM_EVENT.fail);
+          });
       } else {
-        try {
-          // TODO
-          // const game = await gameService.joinGame(code, userName);
-          // addGame(game);
-          // navigation.dispatch(
-          //   StackActions.replace(Routes.Lobby, { gameId: game.id })
-          // );
-        } catch (err) {
-          if (__DEV__) {
-            console.log(err);
-          }
-          transition(FORM_EVENT.fail);
-        }
+        joinGame(gameId, user.id);
       }
     }
   }
@@ -69,50 +86,52 @@ export const JoinGameScreen: React.FC<any> = ({
   }
 
   return (
-    <View style={styles.container}>
-      <View>
-        <Text style={styles.label}>Enter a Game Code:</Text>
-        <TextInput
-          placeholder="Game Code"
-          value={code}
-          onChangeText={setCode}
-          style={styles.input}
-          editable={!currentState.matches(FORM_STATE.submitting)}
-          returnKeyType="next"
-          onSubmitEditing={handleSubmit}
-          blurOnSubmit={false}
-          selectTextOnFocus
-          enablesReturnKeyAutomatically
-          autoFocus
+    <PageContainer>
+      <View style={styles.container}>
+        <Stack>
+          <Title text="Join a Game" />
+          <Input
+            label="Your Name"
+            value={userName}
+            onChangeText={setUserName}
+            editable={!currentState.matches(FORM_STATE.submitting)}
+            returnKeyType="next"
+            onSubmitEditing={handleSubmit}
+            blurOnSubmit={false}
+            selectTextOnFocus
+            enablesReturnKeyAutomatically
+            autoFocus
+          />
+          <Input
+            label="Game Code"
+            value={gameId}
+            onChangeText={setGameId}
+            editable={!currentState.matches(FORM_STATE.submitting)}
+            returnKeyType="go"
+            onSubmitEditing={handleFormSubmit}
+            ref={ref}
+            autoCapitalize="none"
+            autoCorrect={false}
+            selectTextOnFocus
+            enablesReturnKeyAutomatically
+          />
+          <ActivityIndicator
+            animating={currentState.matches(FORM_STATE.submitting)}
+            size="large"
+          />
+          {currentState.matches(FORM_STATE.failure) && <Text>No bueno.</Text>}
+        </Stack>
+        <Button
+          title="Let's Go!"
+          onPress={handleFormSubmit}
+          style={styles.submitButton}
+          disabled={
+            currentState.matches(FORM_STATE.invalid) ||
+            currentState.matches(FORM_STATE.submitting)
+          }
         />
-        <Text style={styles.label}>Your Name:</Text>
-        <TextInput
-          placeholder="Your Name"
-          value={userName}
-          onChangeText={setUserName}
-          style={styles.input}
-          editable={!currentState.matches(FORM_STATE.submitting)}
-          returnKeyType="go"
-          onSubmitEditing={handleFormSubmit}
-          ref={ref}
-          selectTextOnFocus
-          enablesReturnKeyAutomatically
-        />
-        <ActivityIndicator
-          animating={currentState.matches(FORM_STATE.submitting)}
-          size="large"
-        />
-        {currentState.matches(FORM_STATE.failure) && <Text>No bueno.</Text>}
       </View>
-      <Button
-        title="Submit"
-        onPress={handleFormSubmit}
-        disabled={
-          currentState.matches(FORM_STATE.invalid) ||
-          currentState.matches(FORM_STATE.submitting)
-        }
-      />
-    </View>
+    </PageContainer>
   );
 };
 
@@ -124,18 +143,11 @@ export default connect(() => ({ user: selectUser }), {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
     justifyContent: 'space-between',
   },
-  label: {
-    fontSize: 18,
-  },
-  input: {
-    height: 44,
-    borderWidth: 1,
-    borderRadius: 4,
-    borderColor: '#ccc',
-    padding: 8,
+  submitButton: {
+    width: 250,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
 });
