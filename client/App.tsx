@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SplashScreen } from 'expo';
@@ -36,6 +36,7 @@ export default function App(props: any) {
         // Load fonts
         await Font.loadAsync({
           ...AntDesign.font,
+          ...MaterialCommunityIcons.font,
           'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
           'Fugaz-One': require('./assets/fonts/FugazOne-Regular.ttf'),
           'Work-Sans': require('./assets/fonts/WorkSans-Regular.ttf'),

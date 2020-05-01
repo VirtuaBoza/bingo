@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import {
   Platform,
@@ -13,9 +13,9 @@ import {
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Button, Label, PageContainer, Title } from '../components';
 import { useKeyboardEvent, usePromise } from '../hooks';
-import { Game, Term } from '../models';
+import { Game, Term, User } from '../models';
 import { gameService } from '../services';
-import { connect, selectGameById } from '../store';
+import { connect, selectGameById, selectUser } from '../store';
 import {
   createGameUpsertedAction,
   createRemoveTermAction,
@@ -24,8 +24,9 @@ import {
 import uuid from '../utils/uuid';
 
 export const GameLobbyScreen: React.FC<{
-  navigation: any;
   game: Game;
+  user: User;
+  navigation: any;
   updateGame: any;
   upsertTermToGame: any;
   removeTermFromGame: any;
@@ -35,6 +36,7 @@ export const GameLobbyScreen: React.FC<{
   updateGame,
   upsertTermToGame,
   removeTermFromGame,
+  user,
 }) => {
   const [editingTermKey, setEditingTermKey] = useState<string | null>(null);
   const [localTerms, setLocalTerms] = useState<Term[]>(game.terms);
@@ -72,15 +74,23 @@ export const GameLobbyScreen: React.FC<{
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <Button
-          title="Start"
-          onPress={() => {}}
-          style={{ paddingRight: 20 }}
-          disabled={game.terms.length < 8}
-          borderless
-        />
-      ),
+      headerRight: () =>
+        game.game_master_id === user.id ? (
+          <Button
+            title="Start"
+            onPress={() => {}}
+            style={{ paddingRight: 20 }}
+            disabled={game.terms.length < 8}
+            borderless
+          />
+        ) : (
+          <Button
+            title="Ready"
+            onPress={() => {}}
+            style={{ paddingRight: 20 }}
+            borderless
+          />
+        ),
     });
   }, [game.terms]);
 
@@ -165,7 +175,7 @@ export const GameLobbyScreen: React.FC<{
       <Label
         style={{ alignSelf: 'center' }}
         text={
-          game.game_players.length
+          game.game_players.length > 1
             ? readyPlayerCount === game.game_players.length
               ? 'All Plyers Ready!'
               : `${readyPlayerCount}/${game.game_players.length} Players Ready`
@@ -181,7 +191,23 @@ export const GameLobbyScreen: React.FC<{
             paddingVertical: 20,
           }}
         >
-          <Player />
+          <GameMasterIcon
+            username={
+              game.game_players.find(
+                (gp) => gp.player.id === game.game_master_id
+              )!.player.username
+            }
+          />
+          {game.game_players
+            .filter((gp) => gp.player.id !== game.game_master_id)
+            .map((gp) => (
+              <PlayerIcon
+                key={gp.player.id}
+                username={gp.player.username}
+                ready={gp.ready}
+              />
+            ))}
+          <InvitePlayerIcon />
         </ScrollView>
       </View>
       <View
@@ -250,7 +276,7 @@ export default connect(
   ({ route }) => {
     const { gameId } = route.params;
     const gameSelector = selectGameById(gameId);
-    return { game: gameSelector };
+    return { game: gameSelector, user: selectUser };
   },
   {
     updateGame: createGameUpsertedAction,
@@ -307,7 +333,72 @@ const EditingTerm = React.forwardRef<any, any>(
   }
 );
 
-function Player() {
+const GameMasterIcon: React.FC<{ username: string }> = ({ username }) => {
+  return (
+    <View style={styles.playerContainer}>
+      <View
+        style={{
+          backgroundColor: '#FDF1F1',
+          height: 32,
+          width: 32,
+          borderRadius: 50,
+          borderColor: '#F38BA6',
+          borderWidth: 2.3,
+        }}
+      ></View>
+      <View style={{ position: 'absolute', marginTop: 2 }}>
+        <MaterialCommunityIcons name="crown" size={24} color="#F38BA6" />
+      </View>
+      <Text
+        style={[
+          styles.subLabel,
+          {
+            textAlign: 'center',
+          },
+        ]}
+      >
+        {username}
+      </Text>
+    </View>
+  );
+};
+
+const PlayerIcon: React.FC<{ ready: boolean; username: string }> = ({
+  ready,
+  username,
+}) => {
+  return (
+    <View style={styles.playerContainer}>
+      <View
+        style={{
+          backgroundColor: '#FDF1F1',
+          height: 32,
+          width: 32,
+          borderRadius: 50,
+        }}
+      ></View>
+      <View style={{ position: 'absolute' }}>
+        {ready ? (
+          <AntDesign name="checkcircleo" size={32} color="#F7BDC9" />
+        ) : (
+          <AntDesign name="closecircleo" size={32} color="#F7BDC9" />
+        )}
+      </View>
+      <Text
+        style={[
+          styles.subLabel,
+          {
+            textAlign: 'center',
+          },
+        ]}
+      >
+        {username}
+      </Text>
+    </View>
+  );
+};
+
+function InvitePlayerIcon() {
   return (
     <TouchableOpacity onPress={() => {}} style={styles.playerContainer}>
       <View
