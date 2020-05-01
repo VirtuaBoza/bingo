@@ -13,7 +13,7 @@ import {
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Button, Label, PageContainer, Title } from '../components';
 import { useKeyboardEvent, usePromise } from '../hooks';
-import { Game, Term, User } from '../models';
+import { Game, GamePlayer, Term, User } from '../models';
 import { gameService } from '../services';
 import { connect, selectGameById, selectUser } from '../store';
 import {
@@ -85,8 +85,12 @@ export const GameLobbyScreen: React.FC<{
           />
         ) : (
           <Button
-            title="Ready"
-            onPress={() => {}}
+            title={
+              game.game_players.find((gp) => gp.player.id === user.id)!.ready
+                ? 'Not Ready'
+                : 'Ready'
+            }
+            onPress={handleToggleReady}
             style={{ paddingRight: 20 }}
             borderless
           />
@@ -167,6 +171,12 @@ export const GameLobbyScreen: React.FC<{
     }
   }
 
+  function handleToggleReady() {
+    const ready = game.game_players.find((gp) => gp.player.id === user.id)!
+      .ready;
+    gameService.upsertGamePlayer(game.id, user.id, !ready).then(updateGame);
+  }
+
   const readyPlayerCount = game.game_players.filter((player) => player.ready)
     .length;
   return (
@@ -192,19 +202,21 @@ export const GameLobbyScreen: React.FC<{
           }}
         >
           <GameMasterIcon
-            username={
+            gameMaster={
               game.game_players.find(
                 (gp) => gp.player.id === game.game_master_id
-              )!.player.username
+              )!.player
             }
+            userId={user.id}
           />
           {game.game_players
             .filter((gp) => gp.player.id !== game.game_master_id)
             .map((gp) => (
               <PlayerIcon
                 key={gp.player.id}
-                username={gp.player.username}
-                ready={gp.ready}
+                gamePlayer={gp}
+                userId={user.id}
+                onToggleReady={handleToggleReady}
               />
             ))}
           <InvitePlayerIcon />
@@ -333,39 +345,9 @@ const EditingTerm = React.forwardRef<any, any>(
   }
 );
 
-const GameMasterIcon: React.FC<{ username: string }> = ({ username }) => {
-  return (
-    <View style={styles.playerContainer}>
-      <View
-        style={{
-          backgroundColor: '#FDF1F1',
-          height: 32,
-          width: 32,
-          borderRadius: 50,
-          borderColor: '#F38BA6',
-          borderWidth: 2.3,
-        }}
-      ></View>
-      <View style={{ position: 'absolute', marginTop: 2 }}>
-        <MaterialCommunityIcons name="crown" size={24} color="#F38BA6" />
-      </View>
-      <Text
-        style={[
-          styles.subLabel,
-          {
-            textAlign: 'center',
-          },
-        ]}
-      >
-        {username}
-      </Text>
-    </View>
-  );
-};
-
-const PlayerIcon: React.FC<{ ready: boolean; username: string }> = ({
-  ready,
-  username,
+const GameMasterIcon: React.FC<{ gameMaster: User; userId: string }> = ({
+  gameMaster,
+  userId,
 }) => {
   return (
     <View style={styles.playerContainer}>
@@ -375,13 +357,63 @@ const PlayerIcon: React.FC<{ ready: boolean; username: string }> = ({
           height: 32,
           width: 32,
           borderRadius: 50,
+          borderColor: userId === gameMaster.id ? '#F38BA6' : '#F7BDC9',
+          borderWidth: 2.3,
+        }}
+      ></View>
+      <View style={{ position: 'absolute', marginTop: 3 }}>
+        <MaterialCommunityIcons
+          name="crown"
+          size={24}
+          color={userId === gameMaster.id ? '#F38BA6' : '#F7BDC9'}
+        />
+      </View>
+      <Text
+        style={[
+          styles.subLabel,
+          {
+            textAlign: 'center',
+          },
+        ]}
+      >
+        {gameMaster.username}
+      </Text>
+    </View>
+  );
+};
+
+const PlayerIcon: React.FC<{
+  gamePlayer: GamePlayer;
+  userId: string;
+  onToggleReady: () => void;
+}> = ({ gamePlayer, userId, onToggleReady }) => {
+  return (
+    <TouchableOpacity
+      onPress={onToggleReady}
+      style={styles.playerContainer}
+      disabled={userId !== gamePlayer.player.id}
+    >
+      <View
+        style={{
+          backgroundColor: '#FDF1F1',
+          height: 32,
+          width: 32,
+          borderRadius: 50,
         }}
       ></View>
       <View style={{ position: 'absolute' }}>
-        {ready ? (
-          <AntDesign name="checkcircleo" size={32} color="#F7BDC9" />
+        {gamePlayer.ready ? (
+          <AntDesign
+            name="checkcircleo"
+            size={32}
+            color={userId === gamePlayer.player.id ? '#F38BA6' : '#F7BDC9'}
+          />
         ) : (
-          <AntDesign name="closecircleo" size={32} color="#F7BDC9" />
+          <AntDesign
+            name="closecircleo"
+            size={32}
+            color={userId === gamePlayer.player.id ? '#F38BA6' : '#F7BDC9'}
+          />
         )}
       </View>
       <Text
@@ -392,9 +424,9 @@ const PlayerIcon: React.FC<{ ready: boolean; username: string }> = ({
           },
         ]}
       >
-        {username}
+        {gamePlayer.player.username}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -444,7 +476,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(128, 128, 128, 0.2)',
   },
   playerContainer: {
-    width: 50,
+    width: 60,
     alignItems: 'center',
   },
   subLabel: {

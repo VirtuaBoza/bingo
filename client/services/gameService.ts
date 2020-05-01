@@ -119,14 +119,18 @@ export default {
         return Boolean(res.data.delete_terms.affected_rows);
       });
   },
-  joinGame: async (gameId: string, userId: string): Promise<Game> => {
+  upsertGamePlayer: async (
+    gameId: string,
+    userId: string,
+    ready: boolean = false
+  ): Promise<Game> => {
     return client
       .mutate({
-        variables: { gameId, userId },
+        variables: { gameId, userId, ready },
         mutation: gql`
-          mutation JoinGame($gameId: String!, $userId: uuid!) {
+          mutation UpsertGamePlayer($gameId: String!, $userId: uuid!, $ready: Boolean!) {
             insert_game_players(
-              objects: { game_id: $gameId, player_id: $userId, ready: false },
+              objects: { game_id: $gameId, player_id: $userId, ready: $ready },
               on_conflict: {constraint: game_players_pkey, update_columns: ready}
             ) {
               affected_rows

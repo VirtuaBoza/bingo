@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -6,21 +6,29 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import { useKeyboardEvent } from '../hooks';
 
-function PageContainer({ children }) {
+const PageContainer: React.FC<any> = ({ children }) => {
+  const [padding, setPadding] = useState(false);
+  useKeyboardEvent('keyboardWillShow', () => {
+    setPadding(true);
+  });
+  useKeyboardEvent('keyboardWillHide', () => {
+    setPadding(false);
+  });
   return Platform.OS === 'ios' ? (
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <SafeAreaView style={styles.container}>
         <View style={[styles.container, styles.content]}>
           {children}
-          <View style={styles.bump} />
+          {padding ? <View style={styles.bump} /> : null}
         </View>
       </SafeAreaView>
     </KeyboardAvoidingView>
   ) : (
     <View style={[styles.container, styles.content]}>{children}</View>
   );
-}
+};
 
 export default PageContainer;
 

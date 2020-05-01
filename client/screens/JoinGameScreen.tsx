@@ -42,7 +42,7 @@ export const JoinGameScreen: React.FC<any> = ({
 
   async function joinGame(gameId: string, userId: string) {
     try {
-      const game = await gameService.joinGame(gameId, userId);
+      const game = await gameService.upsertGamePlayer(gameId, userId);
       addGame(game);
       navigation.dispatch(
         StackActions.replace(Routes.Lobby, { gameId: game.id })
