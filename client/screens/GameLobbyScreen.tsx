@@ -1,5 +1,5 @@
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Platform,
   ScrollView,
@@ -12,15 +12,11 @@ import {
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Button, Label, PageContainer, Title } from '../components';
-import { useKeyboardEvent, usePromise } from '../hooks';
+import { useKeyboardEvent } from '../hooks';
 import { Game, GamePlayer, Term, User } from '../models';
 import { gameService } from '../services';
 import { connect, selectGameById, selectUser } from '../store';
-import {
-  createGameUpsertedAction,
-  createRemoveTermAction,
-  createUpsertTermAction,
-} from '../store/reducers/gamesReducer';
+import { createGameUpsertedAction } from '../store/reducers/gamesReducer';
 import uuid from '../utils/uuid';
 
 export const GameLobbyScreen: React.FC<{
@@ -28,37 +24,28 @@ export const GameLobbyScreen: React.FC<{
   user: User;
   navigation: any;
   updateGame: any;
-  upsertTermToGame: any;
-  removeTermFromGame: any;
-}> = ({
-  navigation,
-  game,
-  updateGame,
-  upsertTermToGame,
-  removeTermFromGame,
-  user,
-}) => {
-  const [editingTermKey, setEditingTermKey] = useState<string | null>(null);
-  const [localTerms, setLocalTerms] = useState<Term[]>(game.terms);
+}> = ({ navigation, game, updateGame, user }) => {
+  const [editingTerm, setEditingTerm] = useState<Term | null>(null);
   const [showAddButton, setShowAddButton] = useState(true);
   const listRef = useRef<any>(null);
 
-  usePromise(
-    [],
-    () => gameService.getGame(game.id),
-    (returnedGame) => {
-      console.log('loaded game', returnedGame);
-      updateGame(returnedGame);
-      setLocalTerms(returnedGame.terms);
-    }
-  );
+  useEffect(() => {
+    const subscription = gameService
+      .subscribeToGame(game.id)
+      .subscribe(updateGame, (err) => {
+        console.log(err);
+      });
+    return () => {
+      subscription.unsubscribe();
+    };
+  });
 
   useLayoutEffect(() => {
     let timeout: NodeJS.Timeout;
     if (Platform.OS === 'ios') {
       timeout = setTimeout(() => {
-        if (listRef.current && editingTermKey) {
-          const item = localTerms.find((t) => t.id === editingTermKey);
+        if (listRef.current && editingTerm) {
+          const item = game.terms.find((t) => t.id === editingTerm.id);
           if (item) {
             listRef.current!.scrollToItem({ animated: false, item });
           }
@@ -99,21 +86,16 @@ export const GameLobbyScreen: React.FC<{
   }, [game.terms]);
 
   function handleKeyboardDismissed() {
-    const term = localTerms.find((term) => term.id === editingTermKey);
-    if (term) {
-      if (term.text.trim()) {
-        upsertTerm(term);
-      } else if (term.id) {
+    if (editingTerm) {
+      if (editingTerm.text.trim()) {
+        upsertTerm(editingTerm);
+      } else {
         gameService
-          .deleteTerm(game.id, term.id)
-          .then(() => {
-            removeTermFromGame(game.id, term.id);
-          })
+          .deleteTerm(game.id, editingTerm.id)
           .catch((err) => console.log(err));
       }
     }
-    setEditingTermKey(null);
-    setLocalTerms(localTerms.filter((term) => term.text.trim()));
+    setEditingTerm(null);
     setShowAddButton(true);
   }
 
@@ -125,8 +107,7 @@ export const GameLobbyScreen: React.FC<{
 
   function createNewTerm() {
     const newTerm = { id: uuid(), text: '' } as Term;
-    setLocalTerms([...localTerms, newTerm]);
-    setEditingTermKey(newTerm.id);
+    setEditingTerm(newTerm);
   }
 
   function handleAddTermClick() {
@@ -144,25 +125,16 @@ export const GameLobbyScreen: React.FC<{
   }
 
   function upsertTerm(term: Term) {
-    gameService
-      .upsertTerm(game.id, term)
-      .then((savedTerm) => {
-        if (savedTerm) {
-          upsertTermToGame(game.id, term);
-        }
-      })
-      .catch((err) => console.log(err));
+    gameService.upsertTerm(game.id, term).catch((err) => console.log(err));
   }
 
   function handleTermPressed(term: Term) {
     setShowAddButton(false);
-    setEditingTermKey(term.id);
+    setEditingTerm(term);
   }
 
   function handleEditingTermTextChange(text: string) {
-    setLocalTerms(
-      localTerms.map((t) => (t.id === editingTermKey ? { ...t, text } : t))
-    );
+    setEditingTerm({ ...editingTerm, text } as Term);
   }
 
   function handleEditingTermBlur() {
@@ -228,7 +200,7 @@ export const GameLobbyScreen: React.FC<{
         }}
       >
         <Label text="Terms" />
-        {localTerms.length && game.terms.length < 8 ? (
+        {editingTerm && game.terms.length < 8 ? (
           <Text style={styles.subLabel}>
             Add {`${8 - game.terms.length}`} or more terms.
           </Text>
@@ -241,9 +213,15 @@ export const GameLobbyScreen: React.FC<{
               offset: LIST_ITEM_HEIGHT * index,
               index,
             })}
-            data={localTerms}
+            data={
+              editingTerm && game.terms.find((t) => t.id === editingTerm.id)
+                ? game.terms
+                : editingTerm
+                ? [...game.terms, editingTerm!]
+                : game.terms
+            }
             renderItem={({ item: term }) =>
-              term.id === editingTermKey ? (
+              term.id === editingTerm?.id ? (
                 <EditingTerm
                   term={term}
                   onSubmit={handleSubmitTerm}
@@ -263,10 +241,11 @@ export const GameLobbyScreen: React.FC<{
                 flexGrow: 1,
                 paddingVertical: 10,
               },
-              !localTerms.length && {
-                justifyContent: 'center',
-                alignItems: 'center',
-              },
+              !editingTerm &&
+                !game.terms.length && {
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                },
             ]}
             removeClippedSubviews={false}
             disableRightSwipe
@@ -292,8 +271,6 @@ export default connect(
   },
   {
     updateGame: createGameUpsertedAction,
-    upsertTermToGame: createUpsertTermAction,
-    removeTermFromGame: createRemoveTermAction,
   }
 )(GameLobbyScreen);
 

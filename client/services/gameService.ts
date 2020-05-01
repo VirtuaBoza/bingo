@@ -1,3 +1,4 @@
+import { Observable } from 'apollo-link';
 import gql from 'graphql-tag';
 import client from '../apolloClient';
 import { Game, Term } from '../models';
@@ -74,6 +75,37 @@ export default {
       .then((res) => {
         if (res.errors) throw res.errors;
         return res.data.games_by_pk;
+      });
+  },
+  subscribeToGame: (id: string): Observable<Game> => {
+    return client
+      .subscribe({
+        fetchPolicy: 'cache-first',
+        variables: { id },
+        query: gql`
+          query GetGame($id: String!) {
+            games_by_pk(id: $id) {
+              id
+              name
+              terms {
+                id
+                text
+              }
+              game_players {
+                player {
+                  id
+                  username
+                }
+                ready
+              }
+              game_master_id
+            }
+          }
+        `,
+      })
+      .map((res) => {
+        if (res.errors) throw res.errors;
+        return res.data.games_by_pk as Game;
       });
   },
   upsertTerm: (gameId: string, term: Term): Promise<boolean> => {

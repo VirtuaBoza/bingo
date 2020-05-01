@@ -1,27 +1,28 @@
 require('dotenv').config();
-const proxy = require('express-http-proxy');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const app = require('express')();
 
 app.use(
-  proxy(process.env.HASURA_URL, {
-    proxyReqPathResolver(req) {
-      return new Promise(function (resolve, reject) {
-        const parts = req.url.split('?');
-        const queryString = parts[1];
-        const updatedPath = parts[0] + '/v1/graphql';
-        const resolvedPathValue =
-          updatedPath + (queryString ? '?' + queryString : '');
-        resolve(resolvedPathValue);
-      });
+  '/graphql',
+  createProxyMiddleware({
+    target: process.env.HASURA_URL,
+    changeOrigin: true,
+    ws: true,
+    pathRewrite: { '^/graphql': '/v1/graphql' },
+    onProxyReq: function (proxyReq, req, res) {
+      proxyReq.setHeader(
+        'x-hasura-admin-secret',
+        process.env.HASURA_GRAPHQL_ADMIN_SECRET
+      );
     },
-    proxyReqOptDecorator(opts) {
-      return new Promise((resolve) => {
-        opts.headers = {
-          ...opts.headers,
-          'x-hasura-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET,
-        };
-        resolve(opts);
-      });
+    onProxyReqWs: function (proxyReq, req, socket, opts, head) {
+      proxyReq.setHeader(
+        'x-hasura-admin-secret',
+        process.env.HASURA_GRAPHQL_ADMIN_SECRET
+      );
+    },
+    onError: function (err, req, res) {
+      console.log('error', err);
     },
   })
 );

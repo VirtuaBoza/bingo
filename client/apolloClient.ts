@@ -1,8 +1,10 @@
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloClient } from 'apollo-client';
-import { ApolloLink } from 'apollo-link';
+import { ApolloLink, split } from 'apollo-link';
 import { onError } from 'apollo-link-error';
 import { HttpLink } from 'apollo-link-http';
+import { WebSocketLink } from 'apollo-link-ws';
+import { getMainDefinition } from 'apollo-utilities';
 import getEnvVars from './environment';
 
 export default new ApolloClient({
@@ -16,10 +18,24 @@ export default new ApolloClient({
         );
       if (networkError) console.log(`[Network error]: ${networkError}`);
     }),
-    new HttpLink({
-      uri: getEnvVars()?.apiUrl,
-      credentials: 'same-origin',
-    }),
+    split(
+      ({ query }) => {
+        const definition = getMainDefinition(query);
+        return (
+          definition.kind === 'OperationDefinition' &&
+          definition.operation === 'subscription'
+        );
+      },
+      new WebSocketLink({
+        uri: `ws://${getEnvVars()?.domain}/graphql`,
+        options: {
+          reconnect: true,
+        },
+      }),
+      new HttpLink({
+        uri: `http://${getEnvVars()?.domain}/graphql`,
+      })
+    ),
   ]),
   cache: new InMemoryCache(),
 });
