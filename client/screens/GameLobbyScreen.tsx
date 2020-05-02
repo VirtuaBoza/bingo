@@ -1,4 +1,5 @@
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
+import { NavigationProp } from '@react-navigation/native';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Platform,
@@ -16,15 +17,35 @@ import { useKeyboardEvent } from '../hooks';
 import { Game, GamePlayer, Term, User } from '../models';
 import { gameService } from '../services';
 import { connect, selectGameById, selectUser } from '../store';
-import { createGameUpsertedAction } from '../store/reducers/gamesReducer';
+import {
+  createGameUpsertedAction,
+  createRemoveTermAction,
+  createTogglePlayerReadyAction,
+  createUpsertTermAction,
+  GameUpsertedActionCreator,
+  RemoveTermActionCreator,
+  TogglePlayerActionCreator,
+  UpserTermActionCreator,
+} from '../store/reducers/gamesReducer';
 import uuid from '../utils/uuid';
 
 export const GameLobbyScreen: React.FC<{
   game: Game;
   user: User;
-  navigation: any;
-  updateGame: any;
-}> = ({ navigation, game, updateGame, user }) => {
+  navigation: NavigationProp<any>;
+  updateGameInStore: GameUpsertedActionCreator;
+  upsertTermInStore: UpserTermActionCreator;
+  removeTermFromStore: RemoveTermActionCreator;
+  togglePlayerReadyInStore: TogglePlayerActionCreator;
+}> = ({
+  navigation,
+  game,
+  updateGameInStore,
+  user,
+  upsertTermInStore,
+  removeTermFromStore,
+  togglePlayerReadyInStore,
+}) => {
   const [editingTerm, setEditingTerm] = useState<Term | null>(null);
   const [showAddButton, setShowAddButton] = useState(true);
   const listRef = useRef<any>(null);
@@ -32,7 +53,7 @@ export const GameLobbyScreen: React.FC<{
   useEffect(() => {
     const subscription = gameService
       .subscribeToGame(game.id)
-      .subscribe(updateGame, (err) => {
+      .subscribe(updateGameInStore, (err) => {
         console.log(err);
       });
     return () => {
@@ -40,23 +61,20 @@ export const GameLobbyScreen: React.FC<{
     };
   });
 
-  useLayoutEffect(() => {
-    let timeout: NodeJS.Timeout;
+  useEffect(() => {
     if (Platform.OS === 'ios') {
-      timeout = setTimeout(() => {
-        if (listRef.current && editingTerm) {
-          const item = game.terms.find((t) => t.id === editingTerm.id);
-          if (item) {
-            listRef.current!.scrollToItem({ animated: false, item });
-          }
+      if (listRef.current && editingTerm) {
+        const index = game.terms.findIndex((t) => t.id === editingTerm.id);
+        if (index > -1) {
+          listRef.current!.scrollToIndex({ animated: false, index });
+        } else {
+          listRef.current!.scrollToIndex({
+            animated: false,
+            index: game.terms.length,
+          });
         }
-      }, 100);
-    }
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
       }
-    };
+    }
   });
 
   useLayoutEffect(() => {
@@ -90,6 +108,7 @@ export const GameLobbyScreen: React.FC<{
       if (editingTerm.text.trim()) {
         upsertTerm(editingTerm);
       } else {
+        removeTermFromStore(game.id, editingTerm.id);
         gameService
           .deleteTerm(game.id, editingTerm.id)
           .catch((err) => console.log(err));
@@ -125,6 +144,7 @@ export const GameLobbyScreen: React.FC<{
   }
 
   function upsertTerm(term: Term) {
+    upsertTermInStore(game.id, term);
     gameService.upsertTerm(game.id, term).catch((err) => console.log(err));
   }
 
@@ -144,9 +164,12 @@ export const GameLobbyScreen: React.FC<{
   }
 
   function handleToggleReady() {
+    togglePlayerReadyInStore(game.id, user.id);
     const ready = game.game_players.find((gp) => gp.player.id === user.id)!
       .ready;
-    gameService.upsertGamePlayer(game.id, user.id, !ready).then(updateGame);
+    gameService
+      .upsertGamePlayer(game.id, user.id, !ready)
+      .catch((err) => console.log(err));
   }
 
   const readyPlayerCount = game.game_players.filter((player) => player.ready)
@@ -223,7 +246,7 @@ export const GameLobbyScreen: React.FC<{
             renderItem={({ item: term }) =>
               term.id === editingTerm?.id ? (
                 <EditingTerm
-                  term={term}
+                  term={editingTerm}
                   onSubmit={handleSubmitTerm}
                   onChange={handleEditingTermTextChange}
                   onBlur={handleEditingTermBlur}
@@ -270,7 +293,10 @@ export default connect(
     return { game: gameSelector, user: selectUser };
   },
   {
-    updateGame: createGameUpsertedAction,
+    updateGameInStore: createGameUpsertedAction,
+    upsertTermInStore: createUpsertTermAction,
+    removeTermFromStore: createRemoveTermAction,
+    togglePlayerReadyInStore: createTogglePlayerReadyAction,
   }
 )(GameLobbyScreen);
 

@@ -43,6 +43,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   bump: {
-    height: 20,
+    height: 25,
   },
 });
