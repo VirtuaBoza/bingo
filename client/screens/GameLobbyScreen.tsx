@@ -46,33 +46,37 @@ export const GameLobbyScreen: React.FC<{
   removeTermFromStore,
   togglePlayerReadyInStore,
 }) => {
+  const [updating, setUpdating] = useState(false);
   const [editingTerm, setEditingTerm] = useState<Term | null>(null);
   const [showAddButton, setShowAddButton] = useState(true);
   const listRef = useRef<any>(null);
 
-  useEffect(() => {
-    const subscription = gameService
-      .subscribeToGame(game.id)
-      .subscribe(updateGameInStore, (err) => {
+  useLayoutEffect(() => {
+    const subscription = gameService.subscribeToGame(game.id).subscribe(
+      (g) => {
+        if (!updating) {
+          updateGameInStore(g);
+        }
+      },
+      (err) => {
         console.log(err);
-      });
+      }
+    );
     return () => {
       subscription.unsubscribe();
     };
   });
 
   useEffect(() => {
-    if (Platform.OS === 'ios') {
-      if (listRef.current && editingTerm) {
-        const index = game.terms.findIndex((t) => t.id === editingTerm.id);
-        if (index > -1) {
-          listRef.current!.scrollToIndex({ animated: false, index });
-        } else {
-          listRef.current!.scrollToIndex({
-            animated: false,
-            index: game.terms.length,
-          });
-        }
+    if (Platform.OS === 'ios' && listRef.current && editingTerm) {
+      const index = game.terms.findIndex((t) => t.id === editingTerm.id);
+      if (index > -1) {
+        listRef.current!.scrollToIndex({ animated: false, index });
+      } else {
+        listRef.current!.scrollToIndex({
+          animated: false,
+          index: game.terms.length,
+        });
       }
     }
   });
@@ -90,11 +94,7 @@ export const GameLobbyScreen: React.FC<{
           />
         ) : (
           <Button
-            title={
-              game.game_players.find((gp) => gp.player.id === user.id)!.ready
-                ? 'Not Ready'
-                : 'Ready'
-            }
+            title="Toggle Ready"
             onPress={handleToggleReady}
             style={{ paddingRight: 20 }}
             borderless
@@ -164,12 +164,17 @@ export const GameLobbyScreen: React.FC<{
   }
 
   function handleToggleReady() {
+    setUpdating(true);
     togglePlayerReadyInStore(game.id, user.id);
     const ready = game.game_players.find((gp) => gp.player.id === user.id)!
       .ready;
     gameService
       .upsertGamePlayer(game.id, user.id, !ready)
-      .catch((err) => console.log(err));
+      .then(() => setUpdating(false))
+      .catch((err) => {
+        console.log(err);
+        setUpdating(false);
+      });
   }
 
   const readyPlayerCount = game.game_players.filter((player) => player.ready)

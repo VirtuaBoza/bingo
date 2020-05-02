@@ -26,7 +26,6 @@ export default {
     });
   },
   delete: (url: string) => {
-    console.log(url);
     return fetch(url, {
       method: 'DELETE',
     }).then((res) => {

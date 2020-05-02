@@ -65,7 +65,6 @@ export default {
   subscribeToGame: (id: string): Observable<Game> => {
     return client
       .subscribe({
-        fetchPolicy: 'cache-first',
         variables: { id },
         query: gql`
           query GetGame($id: String!) {
