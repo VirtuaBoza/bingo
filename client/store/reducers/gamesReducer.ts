@@ -16,14 +16,14 @@ export const createGameUpsertedAction: GameUpsertedActionCreator = (game) => {
 };
 
 const GAMES_UPSERT_TERM_TO_GAME = 'GAMES_UPSERT_TERM_TO_GAME';
-interface UpserTermPayload {
+interface UpsertTermPayload {
   gameId: string;
   term: Term;
 }
 export type UpserTermActionCreator = (
   gameId: string,
   term: Term
-) => Action<UpserTermPayload>;
+) => Action<UpsertTermPayload>;
 export const createUpsertTermAction: UpserTermActionCreator = (
   gameId,
   term
@@ -96,12 +96,16 @@ export function gamesReducer(
       return { ...games, [game.id]: game };
     }
     case GAMES_UPSERT_TERM_TO_GAME: {
-      const { gameId, term } = payload as UpserTermPayload;
+      const { gameId, term } = payload as UpsertTermPayload;
       return {
         ...games,
         [gameId]: {
           ...games[gameId],
-          terms: [...games[gameId].terms.filter((t) => t.id !== term.id), term],
+          terms: games[gameId].terms.find((t) => t.id === term.id)
+            ? games[gameId].terms.map((t) =>
+                t.id === term.id ? { ...term } : t
+              )
+            : [...games[gameId].terms, term],
         },
       };
     }

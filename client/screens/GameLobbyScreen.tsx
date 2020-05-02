@@ -223,7 +223,7 @@ export const GameLobbyScreen: React.FC<{
         }}
       >
         <Label text="Terms" />
-        {editingTerm && game.terms.length < 8 ? (
+        {game.terms.length < 8 ? (
           <Text style={styles.subLabel}>
             Add {`${8 - game.terms.length}`} or more terms.
           </Text>

@@ -7,7 +7,7 @@ const GAME = `
 {
   id
   name
-  terms {
+  terms(order_by: {created_at: asc}) {
     id
     text
   }
@@ -53,22 +53,7 @@ export default {
         variables: { id },
         query: gql`
           query GetGame($id: String!) {
-            games_by_pk(id: $id) {
-              id
-              name
-              terms {
-                id
-                text
-              }
-              game_players {
-                player {
-                  id
-                  username
-                }
-                ready
-              }
-              game_master_id
-            }
+            games_by_pk(id: $id) ${GAME}
           }
         `,
       })
@@ -84,22 +69,7 @@ export default {
         variables: { id },
         query: gql`
           query GetGame($id: String!) {
-            games_by_pk(id: $id) {
-              id
-              name
-              terms {
-                id
-                text
-              }
-              game_players {
-                player {
-                  id
-                  username
-                }
-                ready
-              }
-              game_master_id
-            }
+            games_by_pk(id: $id) ${GAME}
           }
         `,
       })
