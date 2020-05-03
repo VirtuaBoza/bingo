@@ -1,4 +1,4 @@
-import { StackActions } from '@react-navigation/native';
+import { NavigationProp, StackActions } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Button, Input, PageContainer, Stack, Title } from '../components';
@@ -8,28 +8,41 @@ import {
   FORM_STATE,
   useFormStateMachine,
 } from '../hooks/useMachine';
+import { User } from '../models';
 import { gameService, userService } from '../services';
 import { connect, selectUser } from '../store';
-import { createGameUpsertedAction } from '../store/reducers/gamesReducer';
-import { createSetUserAction } from '../store/reducers/userReducer';
+import {
+  createGameUpsertedAction,
+  GameUpsertedActionCreator,
+} from '../store/reducers/gamesReducer';
+import {
+  createSetUserAction,
+  SetUserActionCreator,
+} from '../store/reducers/userReducer';
 
-export const JoinGameScreen: React.FC<any> = ({
-  user,
-  addGame,
-  setUser,
-  navigation,
-}) => {
-  const [gameId, setGameId] = useState('');
+export const JoinGameScreen: React.FC<{
+  user: User;
+  addGame: GameUpsertedActionCreator;
+  setUser: SetUserActionCreator;
+  navigation: NavigationProp<any>;
+  route: any;
+}> = ({ user, addGame, setUser, navigation, route }) => {
+  const [gameId, setGameId] = useState(
+    (route.params && route.params.gameId) || ''
+  );
   const [userName, setUserName] = useState(user.username || '');
   const [currentState, transition] = useFormStateMachine();
-  const ref = useRef<any>();
+  const nameRef = useRef<any>();
+  const gameIdRef = useRef<any>();
 
   useEffect(() => {
-    if (userName) {
-      setTimeout(() => {
-        ref.current.focus();
-      }, 1);
-    }
+    setTimeout(() => {
+      if (!userName) {
+        nameRef.current.focus();
+      } else if (userName && !gameId) {
+        gameIdRef.current.focus();
+      }
+    }, 1);
   }, []);
 
   useEffect(() => {
@@ -60,7 +73,6 @@ export const JoinGameScreen: React.FC<any> = ({
       currentState.matches(FORM_STATE.valid) ||
       currentState.matches(FORM_STATE.failure)
     ) {
-      setUser(userName);
       transition(FORM_EVENT.submit);
       if (!user.id) {
         userService
@@ -82,7 +94,7 @@ export const JoinGameScreen: React.FC<any> = ({
   }
 
   function handleSubmit() {
-    ref.current.focus();
+    gameIdRef.current.focus();
   }
 
   return (
@@ -97,10 +109,10 @@ export const JoinGameScreen: React.FC<any> = ({
             editable={!currentState.matches(FORM_STATE.submitting)}
             returnKeyType="next"
             onSubmitEditing={handleSubmit}
+            ref={nameRef}
             blurOnSubmit={false}
             selectTextOnFocus
             enablesReturnKeyAutomatically
-            autoFocus
           />
           <Input
             label="Game Code"
@@ -109,7 +121,7 @@ export const JoinGameScreen: React.FC<any> = ({
             editable={!currentState.matches(FORM_STATE.submitting)}
             returnKeyType="go"
             onSubmitEditing={handleFormSubmit}
-            ref={ref}
+            ref={gameIdRef}
             autoCapitalize="none"
             autoCorrect={false}
             selectTextOnFocus

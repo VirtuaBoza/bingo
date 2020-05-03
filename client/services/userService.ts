@@ -13,6 +13,7 @@ export default {
 
     return client
       .mutate({
+        variables: { username, token },
         mutation: gql`
           mutation AddPlayer($username: String!, $token: String) {
             insert_players(
@@ -25,7 +26,6 @@ export default {
             }
           }
         `,
-        variables: { username, token },
       })
       .then((res) => {
         if (res.errors) throw res.errors;

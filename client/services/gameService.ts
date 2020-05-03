@@ -11,7 +11,7 @@ const GAME = `
     id
     text
   }
-  game_players {
+  game_players(order_by: {created_at: asc}) {
     player {
       id
       username

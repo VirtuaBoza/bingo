@@ -1,18 +1,23 @@
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NavigationProp } from '@react-navigation/native';
+import { Linking } from 'expo';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
+  Animated,
+  Dimensions,
   Platform,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TextInput,
+  TouchableHighlight,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Button, Label, PageContainer, Title } from '../components';
+import Routes from '../constants/Routes';
 import { useKeyboardEvent } from '../hooks';
 import { Game, GamePlayer, Term, User } from '../models';
 import { gameService } from '../services';
@@ -28,6 +33,9 @@ import {
   UpserTermActionCreator,
 } from '../store/reducers/gamesReducer';
 import uuid from '../utils/uuid';
+
+let animationIsRunning = false;
+let updating = false;
 
 export const GameLobbyScreen: React.FC<{
   game: Game;
@@ -46,7 +54,7 @@ export const GameLobbyScreen: React.FC<{
   removeTermFromStore,
   togglePlayerReadyInStore,
 }) => {
-  const [updating, setUpdating] = useState(false);
+  // const [updating, setUpdating] = useState(false);
   const [editingTerm, setEditingTerm] = useState<Term | null>(null);
   const [showAddButton, setShowAddButton] = useState(true);
   const listRef = useRef<any>(null);
@@ -108,10 +116,7 @@ export const GameLobbyScreen: React.FC<{
       if (editingTerm.text.trim()) {
         upsertTerm(editingTerm);
       } else {
-        removeTermFromStore(game.id, editingTerm.id);
-        gameService
-          .deleteTerm(game.id, editingTerm.id)
-          .catch((err) => console.log(err));
+        removeTerm(editingTerm);
       }
     }
     setEditingTerm(null);
@@ -148,6 +153,20 @@ export const GameLobbyScreen: React.FC<{
     gameService.upsertTerm(game.id, term).catch((err) => console.log(err));
   }
 
+  function removeTerm(term: Term) {
+    updating = true;
+    removeTermFromStore(game.id, term.id);
+    gameService
+      .deleteTerm(game.id, term.id)
+      .then(() => {
+        updating = false;
+      })
+      .catch((err) => {
+        updating = false;
+        console.log(err);
+      });
+  }
+
   function handleTermPressed(term: Term) {
     setShowAddButton(false);
     setEditingTerm(term);
@@ -164,21 +183,38 @@ export const GameLobbyScreen: React.FC<{
   }
 
   function handleToggleReady() {
-    setUpdating(true);
+    // setUpdating(true);
+    updating = true;
     togglePlayerReadyInStore(game.id, user.id);
     const ready = game.game_players.find((gp) => gp.player.id === user.id)!
       .ready;
     gameService
       .upsertGamePlayer(game.id, user.id, !ready)
-      .then(() => setUpdating(false))
+      .then(() => {
+        // setUpdating(false);
+        updating = false;
+      })
       .catch((err) => {
         console.log(err);
-        setUpdating(false);
+        // setUpdating(false);
+        updating = false;
       });
   }
 
   const readyPlayerCount = game.game_players.filter((player) => player.ready)
     .length;
+  const localTerms =
+    editingTerm && game.terms.find((t) => t.id === editingTerm.id)
+      ? game.terms
+      : editingTerm
+      ? [...game.terms, editingTerm!]
+      : game.terms;
+  const rowTranslateAnimatedValues = localTerms.reduce<{
+    [key: string]: Animated.Value;
+  }>((a, c) => {
+    a[c.id] = new Animated.Value(1);
+    return a;
+  }, {});
   return (
     <PageContainer>
       <Title text={game.name} />
@@ -219,7 +255,7 @@ export const GameLobbyScreen: React.FC<{
                 onToggleReady={handleToggleReady}
               />
             ))}
-          <InvitePlayerIcon />
+          <InvitePlayerIcon gameId={game.id} />
         </ScrollView>
       </View>
       <View
@@ -235,21 +271,18 @@ export const GameLobbyScreen: React.FC<{
         ) : null}
         <View style={{ flex: 1, paddingVertical: 10 }}>
           <SwipeListView
+            disableRightSwipe
+            rightOpenValue={-Dimensions.get('window').width}
             listViewRef={(ref) => (listRef.current = ref)}
             getItemLayout={(data: any, index: any) => ({
               length: LIST_ITEM_HEIGHT,
               offset: LIST_ITEM_HEIGHT * index,
               index,
             })}
-            data={
-              editingTerm && game.terms.find((t) => t.id === editingTerm.id)
-                ? game.terms
-                : editingTerm
-                ? [...game.terms, editingTerm!]
-                : game.terms
-            }
-            renderItem={({ item: term }) =>
-              term.id === editingTerm?.id ? (
+            data={localTerms}
+            keyExtractor={(item: Term) => item.id}
+            renderItem={({ item }) =>
+              item.id === editingTerm?.id ? (
                 <EditingTerm
                   term={editingTerm}
                   onSubmit={handleSubmitTerm}
@@ -257,9 +290,30 @@ export const GameLobbyScreen: React.FC<{
                   onBlur={handleEditingTermBlur}
                 />
               ) : (
-                <ReadonlyTerm term={term} onPress={handleTermPressed} />
+                <ReadonlyTerm
+                  term={item}
+                  onPress={handleTermPressed}
+                  rowTranslateAnimatedValues={rowTranslateAnimatedValues}
+                />
               )
             }
+            renderHiddenItem={() => <View></View>}
+            onSwipeValueChange={(swipeData) => {
+              const { key, value } = swipeData;
+              if (
+                value < -Dimensions.get('window').width &&
+                !animationIsRunning
+              ) {
+                animationIsRunning = true;
+                Animated.timing(rowTranslateAnimatedValues[key], {
+                  toValue: 0,
+                  duration: 200,
+                } as any).start(() => {
+                  removeTerm(game.terms.find((t) => t.id === key)!);
+                  animationIsRunning = false;
+                });
+              }
+            }}
             ListEmptyComponent={
               <Text style={styles.subLabel}>Add at least 8 terms.</Text>
             }
@@ -276,7 +330,6 @@ export const GameLobbyScreen: React.FC<{
                 },
             ]}
             removeClippedSubviews={false}
-            disableRightSwipe
           />
         </View>
         {showAddButton && (
@@ -305,22 +358,43 @@ export default connect(
   }
 )(GameLobbyScreen);
 
-const ReadonlyTerm = React.memo<any>(
-  React.forwardRef<any, any>(({ term, onPress }, ref) => {
-    function handlePress() {
-      onPress(term);
-    }
+const ReadonlyTerm = React.forwardRef<
+  any,
+  {
+    term: Term;
+    onPress: any;
+    rowTranslateAnimatedValues: { [key: string]: Animated.Value };
+  }
+>(({ term, onPress, rowTranslateAnimatedValues }, ref) => {
+  function handlePress() {
+    onPress(term);
+  }
 
-    return (
-      <TouchableWithoutFeedback onPress={handlePress} ref={ref}>
-        <View style={styles.termContainer}>
+  return (
+    <Animated.View
+      style={[
+        styles.termContainer,
+        {
+          height: rowTranslateAnimatedValues[term.id].interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, LIST_ITEM_HEIGHT],
+          }),
+        },
+      ]}
+    >
+      <TouchableHighlight
+        onPress={handlePress}
+        ref={ref}
+        underlayColor="rgba(128, 128, 128, 0.05)"
+        style={[styles.termContainer, { height: '100%' }]}
+      >
+        <View>
           <Text style={styles.term}>{term.text}</Text>
         </View>
-      </TouchableWithoutFeedback>
-    );
-  }),
-  ({ term: prevTerm }, { term: nextTerm }) => prevTerm.key === nextTerm.key
-);
+      </TouchableHighlight>
+    </Animated.View>
+  );
+});
 
 const EditingTerm = React.forwardRef<any, any>(
   ({ term, onSubmit, onChange, onBlur }, ref) => {
@@ -343,10 +417,18 @@ const EditingTerm = React.forwardRef<any, any>(
         onSubmitEditing={handleSubmitTerm}
         blurOnSubmit={false}
         onBlur={onBlur}
-        style={[styles.termContainer, styles.term]}
+        style={[
+          styles.termContainer,
+          styles.term,
+          {
+            height: LIST_ITEM_HEIGHT,
+          },
+        ]}
         ref={(ref) => {
           myRef.current = ref;
-          externalRef!.current = ref;
+          if (externalRef) {
+            externalRef.current = ref;
+          }
         }}
       />
     );
@@ -438,9 +520,27 @@ const PlayerIcon: React.FC<{
   );
 };
 
-function InvitePlayerIcon() {
+const InvitePlayerIcon: React.FC<{ gameId: string }> = ({ gameId }) => {
+  function handleInvitePlayerClick() {
+    updating = true;
+    Share.share({
+      message: Linking.makeUrl(
+        `${Routes.JoinGame}?gameId=${encodeURIComponent(gameId)}`
+      ),
+    })
+      .then(() => {
+        updating = false;
+      })
+      .catch((err) => {
+        updating = false;
+        console.log(err);
+      });
+  }
   return (
-    <TouchableOpacity onPress={() => {}} style={styles.playerContainer}>
+    <TouchableOpacity
+      onPress={handleInvitePlayerClick}
+      style={styles.playerContainer}
+    >
       <View
         style={{
           backgroundColor: '#FDF1F1',
@@ -460,18 +560,17 @@ function InvitePlayerIcon() {
           },
         ]}
       >
-        Send Invite
+        Invite Players
       </Text>
     </TouchableOpacity>
   );
-}
+};
 
 const LIST_ITEM_HEIGHT = 42;
 
 const styles = StyleSheet.create({
   termContainer: {
     backgroundColor: '#fff',
-    height: LIST_ITEM_HEIGHT,
     justifyContent: 'center',
   },
   term: {

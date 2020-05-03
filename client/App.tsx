@@ -20,9 +20,10 @@ const Stack = createStackNavigator();
 
 export default function App(props: any) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
-  const [initialNavigationState, setInitialNavigationState] = React.useState();
+  // const [initialNavigationState, setInitialNavigationState] = React.useState();
   const containerRef = React.useRef();
-  const { getInitialState } = useLinking(containerRef);
+  // const { getInitialState } = useLinking(containerRef);
+  useLinking(containerRef);
 
   // Load any resources or data that we need prior to rendering the app
   React.useEffect(() => {
@@ -31,7 +32,7 @@ export default function App(props: any) {
         SplashScreen.preventAutoHide();
 
         // Load our initial navigation state
-        setInitialNavigationState((await getInitialState()) as any);
+        // setInitialNavigationState((await getInitialState()) as any);
 
         // Load fonts
         await Font.loadAsync({
@@ -62,7 +63,7 @@ export default function App(props: any) {
           {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
           <NavigationContainer
             ref={containerRef}
-            initialState={initialNavigationState}
+            // initialState={initialNavigationState}
           >
             <Stack.Navigator
               screenOptions={{

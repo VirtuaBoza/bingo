@@ -1,7 +1,7 @@
 export default {
-  Home: 'Home',
-  NewGame: 'New Game',
-  Lobby: 'Lobby',
-  Games: 'Games',
-  JoinGame: 'Join Game',
+  Home: 'home',
+  NewGame: 'newgame',
+  Lobby: 'lobby',
+  Games: 'games',
+  JoinGame: 'joingame',
 };

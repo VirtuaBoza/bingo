@@ -1,11 +1,15 @@
 import User from '../../models/User.model';
 import Action from '../Action.model';
 
-const USER_SET_USERNAME = 'USER_SET_USERNAME';
-export function createSetUserAction(user: User): Action<User> {
+interface SetUserPayload {
+  user: User;
+}
+export type SetUserActionCreator = (user: User) => Action<SetUserPayload>;
+const USER_SET_USER = 'USER_SET_USER';
+export function createSetUserAction(user: User): Action<SetUserPayload> {
   return {
-    type: USER_SET_USERNAME,
-    payload: user,
+    type: USER_SET_USER,
+    payload: { user },
   };
 }
 
@@ -17,8 +21,10 @@ export const initialUserState: UserState = {
 
 export function userReducer(user: UserState, { type, payload }: Action<any>) {
   switch (type) {
-    case USER_SET_USERNAME:
-      return { ...payload };
+    case USER_SET_USER: {
+      const { user } = payload as SetUserPayload;
+      return { ...user };
+    }
     default:
       return user;
   }
