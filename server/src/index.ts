@@ -1,7 +1,7 @@
 require('dotenv').config();
 import express from 'express';
 import hasuraProxy from './hasuraProxy';
-import router from './router';
+import router from './apiRouter';
 const app = express();
 
 app.use('/graphql', hasuraProxy);

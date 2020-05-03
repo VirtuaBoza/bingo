@@ -3,6 +3,7 @@ import { ApolloClient } from 'apollo-client';
 import { ApolloLink } from 'apollo-link';
 import { onError } from 'apollo-link-error';
 import { HttpLink } from 'apollo-link-http';
+import fetch from 'node-fetch';
 
 export default new ApolloClient({
   link: ApolloLink.from([
@@ -16,7 +17,11 @@ export default new ApolloClient({
       if (networkError) console.log(`[Network error]: ${networkError}`);
     }),
     new HttpLink({
-      uri: `${process.env.HASURA_URL}/graphql`,
+      uri: `${process.env.HASURA_URL}/v1/graphql`,
+      fetch: fetch as any,
+      headers: {
+        'x-hasura-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET,
+      },
     }),
   ]),
   cache: new InMemoryCache(),
