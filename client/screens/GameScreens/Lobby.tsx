@@ -16,12 +16,12 @@ import {
   View,
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import { Button, Label, PageContainer, Title } from '../components';
-import Routes from '../constants/Routes';
-import { useKeyboardEvent } from '../hooks';
-import { Game, GamePlayer, Term, User } from '../models';
-import { gameService } from '../services';
-import { connect, selectGameById, selectUser } from '../store';
+import { Button, Label, PageContainer, Title } from '../../components';
+import Routes from '../../constants/Routes';
+import { useKeyboardEvent } from '../../hooks';
+import { Game, GamePlayer, Term, User } from '../../models';
+import { gameService } from '../../services';
+import { connect, selectGameById, selectUser } from '../../store';
 import {
   createGameUpsertedAction,
   createRemoveTermAction,
@@ -31,8 +31,8 @@ import {
   RemoveTermActionCreator,
   TogglePlayerActionCreator,
   UpserTermActionCreator,
-} from '../store/reducers/gamesReducer';
-import uuid from '../utils/uuid';
+} from '../../store/reducers/gamesReducer';
+import uuid from '../../utils/uuid';
 
 let animationIsRunning = false;
 let updating = false;

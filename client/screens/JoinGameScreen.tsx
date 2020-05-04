@@ -56,10 +56,14 @@ export const JoinGameScreen: React.FC<{
   async function joinGame(gameId: string, userId: string) {
     try {
       const game = await gameService.upsertGamePlayer(gameId, userId);
-      addGame(game);
-      navigation.dispatch(
-        StackActions.replace(Routes.Lobby, { gameId: game.id })
-      );
+      if (game) {
+        addGame(game);
+        navigation.dispatch(
+          StackActions.replace(Routes.Lobby, { gameId: game.id })
+        );
+      } else {
+        transition(FORM_EVENT.fail);
+      }
     } catch (err) {
       if (__DEV__) {
         console.log(err);

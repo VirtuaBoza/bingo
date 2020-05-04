@@ -8,12 +8,10 @@ interface GameUpsertedPayload {
 export type GameUpsertedActionCreator = (
   game: Game
 ) => Action<GameUpsertedPayload>;
-export const createGameUpsertedAction: GameUpsertedActionCreator = (game) => {
-  return {
-    type: GAMES_GAME_CREATED_OR_UPDATED,
-    payload: { game },
-  };
-};
+export const createGameUpsertedAction: GameUpsertedActionCreator = (game) => ({
+  type: GAMES_GAME_CREATED_OR_UPDATED,
+  payload: { game },
+});
 
 const GAMES_UPSERT_TERM_TO_GAME = 'GAMES_UPSERT_TERM_TO_GAME';
 interface UpsertTermPayload {
@@ -27,15 +25,13 @@ export type UpserTermActionCreator = (
 export const createUpsertTermAction: UpserTermActionCreator = (
   gameId,
   term
-) => {
-  return {
-    type: GAMES_UPSERT_TERM_TO_GAME,
-    payload: {
-      gameId,
-      term,
-    },
-  };
-};
+) => ({
+  type: GAMES_UPSERT_TERM_TO_GAME,
+  payload: {
+    gameId,
+    term,
+  },
+});
 
 const GAMES_REMOVE_TERM_FROM_GAME = 'GAMES_REMOVE_TERM_FROM_GAME';
 interface RemoveTermPayload {
@@ -49,15 +45,13 @@ export type RemoveTermActionCreator = (
 export const createRemoveTermAction: RemoveTermActionCreator = (
   gameId,
   termId
-) => {
-  return {
-    type: GAMES_REMOVE_TERM_FROM_GAME,
-    payload: {
-      gameId,
-      termId,
-    },
-  };
-};
+) => ({
+  type: GAMES_REMOVE_TERM_FROM_GAME,
+  payload: {
+    gameId,
+    termId,
+  },
+});
 
 const GAMES_TOGGLE_PLAYER_READY = 'GAMES_TOGGLE_PLAYER_READY';
 interface TogglePlayerReadyPayload {
@@ -71,15 +65,27 @@ export type TogglePlayerActionCreator = (
 export const createTogglePlayerReadyAction: TogglePlayerActionCreator = (
   gameId,
   userId
-) => {
-  return {
-    type: GAMES_TOGGLE_PLAYER_READY,
-    payload: {
-      gameId,
-      userId,
-    },
-  };
-};
+) => ({
+  type: GAMES_TOGGLE_PLAYER_READY,
+  payload: {
+    gameId,
+    userId,
+  },
+});
+
+const GAMES_REFRESH_GAMES = 'GAMES_REFRESH_GAMES';
+interface RefreshGamesPayload {
+  games: Game[];
+}
+export type RefreshGamesActionCreator = (
+  games: Game[]
+) => Action<RefreshGamesPayload>;
+export const createRefreshGamesAction: RefreshGamesActionCreator = (games) => ({
+  type: GAMES_REFRESH_GAMES,
+  payload: {
+    games,
+  },
+});
 
 export interface GamesState {
   [id: string]: Game;
@@ -130,6 +136,13 @@ export function gamesReducer(
           ),
         },
       };
+    }
+    case GAMES_REFRESH_GAMES: {
+      const { games: newGames } = payload as RefreshGamesPayload;
+      return newGames.reduce<GamesState>((acc, cur) => {
+        acc[cur.id] = cur;
+        return acc;
+      }, {});
     }
     default:
       return games;

@@ -9,10 +9,10 @@ import 'react-native-gesture-handler';
 import ErrorBoundary from './components/ErrorBoundary';
 import Routes from './constants/Routes';
 import useLinking from './navigation/useLinking';
-import GameLobbyScreen from './screens/GameLobbyScreen';
-import GamesScreen from './screens/GamesScreen';
+import GameLobbyScreen from './screens/GameScreen';
 import HomeScreen from './screens/HomeScreen';
 import JoinGameScreen from './screens/JoinGameScreen';
+import MyGamesScreen from './screens/MyGamesScreen';
 import NewGameScreen from './screens/NewGameScreen';
 import { StoreProvider } from './store';
 
@@ -82,7 +82,7 @@ export default function App(props: any) {
               />
               <Stack.Screen name={Routes.NewGame} component={NewGameScreen} />
               <Stack.Screen name={Routes.Lobby} component={GameLobbyScreen} />
-              <Stack.Screen name={Routes.Games} component={GamesScreen} />
+              <Stack.Screen name={Routes.Games} component={MyGamesScreen} />
               <Stack.Screen name={Routes.JoinGame} component={JoinGameScreen} />
             </Stack.Navigator>
           </NavigationContainer>

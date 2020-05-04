@@ -1,0 +1,5 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: ALTER TABLE "public"."game_players" DROP COLUMN "board";
+  type: run_sql

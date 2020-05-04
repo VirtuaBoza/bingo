@@ -7,25 +7,28 @@ import MafingoLogo from '../svg/MafingoLogo';
 
 export const HomeScreen: React.FC<any> = ({ navigation, resetStore }) => {
   return (
-    <PageContainer>
+    <PageContainer keyboardAvoiding={false}>
       <View style={styles.logoContainer}>
         <View style={[StyleSheet.absoluteFill]}>
           <MafingoLogo />
         </View>
       </View>
-      <Button
+      <MenuButton
         style={styles.primaryButton}
         title="Join a Game"
-        onPress={() => navigation.navigate(Routes.JoinGame)}
+        route={Routes.JoinGame}
+        navigation={navigation}
       />
       <Stack>
-        <Button
+        <MenuButton
           title="Start a New Game"
-          onPress={() => navigation.navigate(Routes.NewGame)}
+          route={Routes.NewGame}
+          navigation={navigation}
         />
-        <Button
+        <MenuButton
           title="My Games"
-          onPress={() => navigation.navigate(Routes.Games)}
+          route={Routes.Games}
+          navigation={navigation}
         />
         {__DEV__ && (
           <Button
@@ -39,6 +42,14 @@ export const HomeScreen: React.FC<any> = ({ navigation, resetStore }) => {
 };
 
 export default connect(null, { resetStore: createRootResetAction })(HomeScreen);
+
+const MenuButton: React.FC<any> = ({ title, route, navigation, ...rest }) => {
+  function handlePress() {
+    navigation.navigate(route);
+  }
+
+  return <Button {...rest} title={title} onPress={handlePress} />;
+};
 
 const styles = StyleSheet.create({
   logoContainer: {

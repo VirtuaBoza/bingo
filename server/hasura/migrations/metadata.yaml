@@ -1,0 +1,59 @@
+version: 2
+tables:
+- table:
+    schema: public
+    name: game_players
+  object_relationships:
+  - name: game
+    using:
+      foreign_key_constraint_on: game_id
+  - name: player
+    using:
+      foreign_key_constraint_on: player_id
+- table:
+    schema: public
+    name: game_status
+  is_enum: true
+- table:
+    schema: public
+    name: games
+  object_relationships:
+  - name: game_master
+    using:
+      foreign_key_constraint_on: game_master_id
+  - name: game_status
+    using:
+      foreign_key_constraint_on: status
+  array_relationships:
+  - name: game_players
+    using:
+      foreign_key_constraint_on:
+        column: game_id
+        table:
+          schema: public
+          name: game_players
+  - name: terms
+    using:
+      foreign_key_constraint_on:
+        column: game_id
+        table:
+          schema: public
+          name: terms
+- table:
+    schema: public
+    name: players
+  array_relationships:
+  - name: game_players
+    using:
+      foreign_key_constraint_on:
+        column: player_id
+        table:
+          schema: public
+          name: game_players
+- table:
+    schema: public
+    name: terms
+  object_relationships:
+  - name: game
+    using:
+      foreign_key_constraint_on: game_id

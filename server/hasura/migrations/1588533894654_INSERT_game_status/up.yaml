@@ -1,0 +1,10 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: |-
+      INSERT INTO game_status (value) VALUES
+      ('UNSTARTED'),
+      ('BUILDING'),
+      ('STARTED'),
+      ('FINISHED');
+  type: run_sql

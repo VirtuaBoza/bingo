@@ -1,0 +1,5 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: ALTER TABLE "public"."game_players" ADD COLUMN "board" jsonb NULL;
+  type: run_sql
