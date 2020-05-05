@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { Status } from '../enums/Status.enum';
 import { Game } from '../models';
+import { gameService } from '../services';
 import { connect, selectGameById } from '../store';
+import {
+  createGameUpsertedAction,
+  GameUpsertedActionCreator,
+} from '../store/reducers';
 import {
   GameBoardScreen,
   GameBuildingScreen,
@@ -11,15 +16,39 @@ import {
 
 export const GameScreen: React.FC<{
   game: Game;
-}> = ({ game, ...rest }) => {
-  if (game) {
-    switch (game.status) {
+  updateGameInStore: GameUpsertedActionCreator;
+}> = ({ game: gameFromStore, updateGameInStore, ...rest }) => {
+  const [updating, setUpdating] = useState(false);
+  useEffect(() => {
+    const subscription = gameService
+      .subscribeToGame(gameFromStore.id)
+      .subscribe(
+        (gameFromServer) => {
+          if (
+            !updating &&
+            gameFromServer &&
+            JSON.stringify(gameFromServer) !== JSON.stringify(gameFromStore)
+          ) {
+            updateGameInStore(gameFromServer);
+          }
+        },
+        (err) => {
+          console.log(err);
+        }
+      );
+    return () => {
+      subscription.unsubscribe();
+    };
+  });
+
+  if (gameFromStore) {
+    switch (gameFromStore.status) {
       case Status.Unstarted:
-        return <GameLobbyScreen {...rest} />;
+        return <GameLobbyScreen {...rest} setUpdating={setUpdating} />;
       case Status.Building:
-        return <GameBuildingScreen {...rest} />;
+        return <GameBuildingScreen {...rest} setUpdating={setUpdating} />;
       case Status.Started:
-        return <GameBoardScreen {...rest} />;
+        return <GameBoardScreen {...rest} setUpdating={setUpdating} />;
       case Status.Finished:
         return (
           <View>
@@ -37,8 +66,11 @@ export const GameScreen: React.FC<{
   );
 };
 
-export default connect(({ route }) => {
-  const { gameId } = route.params;
-  const gameSelector = selectGameById(gameId);
-  return { game: gameSelector };
-})(GameScreen);
+export default connect(
+  ({ route }) => {
+    const { gameId } = route.params;
+    const gameSelector = selectGameById(gameId);
+    return { game: gameSelector };
+  },
+  { updateGameInStore: createGameUpsertedAction }
+)(GameScreen);

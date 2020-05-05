@@ -164,29 +164,9 @@ function getMyGames(userId: string): Promise<Game[]> {
       variables: { userId },
       query: gql`
         query GetMyGames($userId: uuid!) {
-          game_players_aggregate(
-            distinct_on: player_id
-            where: { player_id: { _eq: $userId } }
-            order_by: { created_at: desc }
-          ) {
-            nodes {
-              game {
-                id
-                name
-                status
-                terms(order_by: { created_at: asc }) {
-                  id
-                  text
-                }
-                game_players(order_by: { created_at: asc }) {
-                  player {
-                    id
-                    username
-                  }
-                  ready
-                }
-                game_master_id
-              }
+          players_by_pk(id: $userId) {
+            game_players {
+              game ${GAME}
             }
           }
         }
@@ -194,9 +174,13 @@ function getMyGames(userId: string): Promise<Game[]> {
     })
     .then((res) => {
       if (res.errors) throw res.errors;
-      return res.data.game_players_aggregate.nodes.map((n: any) => n.game);
+      return res.data.players_by_pk.game_players.map((n: any) => n.game);
     });
 }
+
+// function startGame(gameId) {
+//   httpClient.post(`http://${getEnvVars()?.domain}/startGame?gameId=${gameId}`)
+// }
 
 export default {
   createGame,

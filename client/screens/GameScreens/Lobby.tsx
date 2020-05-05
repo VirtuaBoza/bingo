@@ -5,6 +5,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
+  Modal,
   Platform,
   ScrollView,
   Share,
@@ -27,7 +28,6 @@ import {
   createRemoveTermAction,
   createTogglePlayerReadyAction,
   createUpsertTermAction,
-  GameUpsertedActionCreator,
   RemoveTermActionCreator,
   TogglePlayerActionCreator,
   UpserTermActionCreator,
@@ -35,45 +35,28 @@ import {
 import uuid from '../../utils/uuid';
 
 let animationIsRunning = false;
-let updating = false;
 
 export const GameLobbyScreen: React.FC<{
   game: Game;
   user: User;
   navigation: NavigationProp<any>;
-  updateGameInStore: GameUpsertedActionCreator;
   upsertTermInStore: UpserTermActionCreator;
   removeTermFromStore: RemoveTermActionCreator;
   togglePlayerReadyInStore: TogglePlayerActionCreator;
+  setUpdating: (updating: boolean) => any;
 }> = ({
   navigation,
   game,
-  updateGameInStore,
   user,
   upsertTermInStore,
   removeTermFromStore,
   togglePlayerReadyInStore,
+  setUpdating,
 }) => {
-  // const [updating, setUpdating] = useState(false);
   const [editingTerm, setEditingTerm] = useState<Term | null>(null);
   const [showAddButton, setShowAddButton] = useState(true);
+  const [starting, setStarting] = useState(false);
   const listRef = useRef<any>(null);
-
-  useLayoutEffect(() => {
-    const subscription = gameService.subscribeToGame(game.id).subscribe(
-      (g) => {
-        if (!updating) {
-          updateGameInStore(g);
-        }
-      },
-      (err) => {
-        console.log(err);
-      }
-    );
-    return () => {
-      subscription.unsubscribe();
-    };
-  });
 
   useEffect(() => {
     if (Platform.OS === 'ios' && listRef.current && editingTerm) {
@@ -95,9 +78,9 @@ export const GameLobbyScreen: React.FC<{
         game.game_master_id === user.id ? (
           <Button
             title="Start"
-            onPress={() => {}}
+            onPress={handleStartPressed}
             style={{ paddingRight: 20 }}
-            disabled={game.terms.length < 8}
+            disabled={/*game.terms.length < 8 || */ starting}
             borderless
           />
         ) : (
@@ -109,7 +92,11 @@ export const GameLobbyScreen: React.FC<{
           />
         ),
     });
-  }, [game.terms]);
+  }, [game.terms, starting]);
+
+  function handleStartPressed() {
+    setStarting(true);
+  }
 
   function handleKeyboardDismissed() {
     if (editingTerm) {
@@ -154,15 +141,15 @@ export const GameLobbyScreen: React.FC<{
   }
 
   function removeTerm(term: Term) {
-    updating = true;
+    setUpdating(true);
     removeTermFromStore(game.id, term.id);
     gameService
       .deleteTerm(game.id, term.id)
       .then(() => {
-        updating = false;
+        setUpdating(false);
       })
       .catch((err) => {
-        updating = false;
+        setUpdating(false);
         console.log(err);
       });
   }
@@ -183,21 +170,18 @@ export const GameLobbyScreen: React.FC<{
   }
 
   function handleToggleReady() {
-    // setUpdating(true);
-    updating = true;
+    setUpdating(true);
     togglePlayerReadyInStore(game.id, user.id);
     const ready = game.game_players.find((gp) => gp.player.id === user.id)!
       .ready;
     gameService
       .upsertGamePlayer(game.id, user.id, !ready)
       .then(() => {
-        // setUpdating(false);
-        updating = false;
+        setUpdating(false);
       })
       .catch((err) => {
         console.log(err);
-        // setUpdating(false);
-        updating = false;
+        setUpdating(false);
       });
   }
 
@@ -217,6 +201,22 @@ export const GameLobbyScreen: React.FC<{
   }, {});
   return (
     <PageContainer>
+      <Modal
+        visible={starting}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setStarting(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modal}>
+            <Button
+              borderless
+              title="Cancel"
+              onPress={() => setStarting(false)}
+            />
+          </View>
+        </View>
+      </Modal>
       <Title text={game.name} />
       <Label
         style={{ alignSelf: 'center' }}
@@ -255,7 +255,7 @@ export const GameLobbyScreen: React.FC<{
                 onToggleReady={handleToggleReady}
               />
             ))}
-          <InvitePlayerIcon gameId={game.id} />
+          <InvitePlayerIcon gameId={game.id} setUpdating={setUpdating} />
         </ScrollView>
       </View>
       <View
@@ -520,19 +520,22 @@ const PlayerIcon: React.FC<{
   );
 };
 
-const InvitePlayerIcon: React.FC<{ gameId: string }> = ({ gameId }) => {
+const InvitePlayerIcon: React.FC<{
+  gameId: string;
+  setUpdating: (updating: boolean) => any;
+}> = ({ gameId, setUpdating }) => {
   function handleInvitePlayerClick() {
-    updating = true;
+    setUpdating(true);
     Share.share({
       message: Linking.makeUrl(
         `${Routes.JoinGame}?gameId=${encodeURIComponent(gameId)}`
       ),
     })
       .then(() => {
-        updating = false;
+        setUpdating(false);
       })
       .catch((err) => {
-        updating = false;
+        setUpdating(false);
         console.log(err);
       });
   }
@@ -590,5 +593,26 @@ const styles = StyleSheet.create({
     fontFamily: 'Work-Sans',
     fontSize: 13,
     color: '#646464',
+  },
+  modalBackdrop: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  modal: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
