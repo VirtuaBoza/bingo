@@ -264,9 +264,9 @@ export const GameLobbyScreen: React.FC<{
         }}
       >
         <Label text="Terms" />
-        {game.terms.length < 8 ? (
+        {(game.terms.length || editingTerm) && game.terms.length < 8 ? (
           <Text style={styles.subLabel}>
-            Add {`${8 - game.terms.length}`} or more terms.
+            Add {`${8 - game.terms.length}`} or more terms
           </Text>
         ) : null}
         <View style={{ flex: 1, paddingVertical: 10 }}>
@@ -315,7 +315,7 @@ export const GameLobbyScreen: React.FC<{
               }
             }}
             ListEmptyComponent={
-              <Text style={styles.subLabel}>Add at least 8 terms.</Text>
+              <Text style={styles.subLabel}>Add at least 8 terms</Text>
             }
             ItemSeparatorComponent={() => <View style={styles.divider}></View>}
             contentContainerStyle={[
