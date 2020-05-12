@@ -1,6 +1,7 @@
 import React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { PageContainer } from '../components';
 import Routes from '../constants/Routes';
 import { usePromise } from '../hooks';
 import { Game, User } from '../models';
@@ -31,7 +32,7 @@ export const MyGamesScreen: React.FC<{
   }
 
   return (
-    <View style={styles.container}>
+    <PageContainer>
       <FlatList
         data={games}
         renderItem={({ item: game }) => (
@@ -43,7 +44,7 @@ export const MyGamesScreen: React.FC<{
         )}
         keyExtractor={(game) => game.id}
       />
-    </View>
+    </PageContainer>
   );
 };
 
@@ -51,11 +52,4 @@ export default connect(() => ({ games: selectGames, user: selectUser }), {
   refreshGames: createRefreshGamesAction,
 })(MyGamesScreen);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
-    justifyContent: 'space-between',
-  },
-});
+const styles = StyleSheet.create({});

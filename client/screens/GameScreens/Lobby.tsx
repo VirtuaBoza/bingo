@@ -18,7 +18,11 @@ import {
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Button, Label, PageContainer, Title } from '../../components';
+import BoardThumbnail from '../../components/BoardThumbnail';
+import Colors from '../../constants/Colors';
+import Layout from '../../constants/Layout';
 import Routes from '../../constants/Routes';
+import { BoardVariant } from '../../enums/BoardVariant.enum';
 import { useKeyboardEvent } from '../../hooks';
 import { Game, GamePlayer, Term, User } from '../../models';
 import { gameService } from '../../services';
@@ -95,6 +99,7 @@ export const GameLobbyScreen: React.FC<{
   }, [game.terms, starting]);
 
   function handleStartPressed() {
+    setUpdating(true);
     setStarting(true);
   }
 
@@ -185,6 +190,10 @@ export const GameLobbyScreen: React.FC<{
       });
   }
 
+  function handleGameStart(variant: BoardVariant) {
+    gameService.startGame(game.id, variant);
+  }
+
   const readyPlayerCount = game.game_players.filter((player) => player.ready)
     .length;
   const localTerms =
@@ -201,22 +210,17 @@ export const GameLobbyScreen: React.FC<{
   }, {});
   return (
     <PageContainer>
-      <Modal
-        visible={starting}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setStarting(false)}
-      >
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modal}>
-            <Button
-              borderless
-              title="Cancel"
-              onPress={() => setStarting(false)}
-            />
-          </View>
-        </View>
-      </Modal>
+      <StartGameModal
+        starting={starting}
+        onCancel={() => {
+          setUpdating(false);
+          setStarting(false);
+        }}
+        onStart={handleGameStart}
+        readyPlayerCount={readyPlayerCount}
+        totalPlayerCount={game.game_players.length}
+        termCount={game.terms.length}
+      />
       <Title text={game.name} />
       <Label
         style={{ alignSelf: 'center' }}
@@ -443,11 +447,12 @@ const GameMasterIcon: React.FC<{ gameMaster: User; userId: string }> = ({
     <View style={styles.playerContainer}>
       <View
         style={{
-          backgroundColor: '#FDF1F1',
+          backgroundColor: Colors.lightPink,
           height: 32,
           width: 32,
           borderRadius: 50,
-          borderColor: userId === gameMaster.id ? '#F38BA6' : '#F7BDC9',
+          borderColor:
+            userId === gameMaster.id ? Colors.primary : Colors.secondary,
           borderWidth: 2.3,
         }}
       ></View>
@@ -455,7 +460,7 @@ const GameMasterIcon: React.FC<{ gameMaster: User; userId: string }> = ({
         <MaterialCommunityIcons
           name="crown"
           size={24}
-          color={userId === gameMaster.id ? '#F38BA6' : '#F7BDC9'}
+          color={userId === gameMaster.id ? Colors.primary : Colors.secondary}
         />
       </View>
       <Text
@@ -485,7 +490,7 @@ const PlayerIcon: React.FC<{
     >
       <View
         style={{
-          backgroundColor: '#FDF1F1',
+          backgroundColor: Colors.lightPink,
           height: 32,
           width: 32,
           borderRadius: 50,
@@ -496,13 +501,21 @@ const PlayerIcon: React.FC<{
           <AntDesign
             name="checkcircleo"
             size={32}
-            color={userId === gamePlayer.player.id ? '#F38BA6' : '#F7BDC9'}
+            color={
+              userId === gamePlayer.player.id
+                ? Colors.primary
+                : Colors.secondary
+            }
           />
         ) : (
           <AntDesign
             name="closecircleo"
             size={32}
-            color={userId === gamePlayer.player.id ? '#F38BA6' : '#F7BDC9'}
+            color={
+              userId === gamePlayer.player.id
+                ? Colors.primary
+                : Colors.secondary
+            }
           />
         )}
       </View>
@@ -546,14 +559,14 @@ const InvitePlayerIcon: React.FC<{
     >
       <View
         style={{
-          backgroundColor: '#FDF1F1',
+          backgroundColor: Colors.lightPink,
           height: 32,
           width: 32,
           borderRadius: 50,
         }}
       ></View>
       <View style={{ position: 'absolute' }}>
-        <AntDesign name="pluscircleo" size={32} color="#F38BA6" />
+        <AntDesign name="pluscircleo" size={32} color={Colors.primary} />
       </View>
       <Text
         style={[
@@ -569,6 +582,107 @@ const InvitePlayerIcon: React.FC<{
   );
 };
 
+const StartGameModal: React.FC<{
+  readyPlayerCount: number;
+  totalPlayerCount: number;
+  termCount: number;
+  starting: boolean;
+  onCancel: any;
+  onStart: (size: BoardVariant) => any;
+}> = ({
+  starting,
+  onCancel,
+  onStart,
+  readyPlayerCount,
+  totalPlayerCount,
+  termCount,
+}) => {
+  const [internalAllReady, setInternalAllReady] = useState(
+    readyPlayerCount === totalPlayerCount
+  );
+  const [loading, setLoading] = useState(false);
+
+  function renderOption(label: string, variant: BoardVariant, minimum: number) {
+    const disabled = loading || termCount < minimum;
+    return (
+      <TouchableOpacity
+        style={styles.boardOption}
+        onPress={
+          disabled
+            ? () => {}
+            : () => {
+                setLoading(true);
+                onStart(variant);
+              }
+        }
+        activeOpacity={disabled ? 1 : 0.2}
+      >
+        <BoardThumbnail variant={variant} opacity={disabled ? 0.3 : 1} />
+        <View style={styles.boardOptionLabelContainer}>
+          <Label text={label} style={{ opacity: disabled ? 0.3 : 1 }} />
+          {disabled && (
+            <Text style={[styles.subLabel]}>
+              Requires {minimum - termCount} more term
+              {minimum - termCount > 1 ? 's' : ''}
+            </Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
+  return (
+    <Modal
+      visible={starting}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={onCancel}
+    >
+      <View style={styles.modalBackdrop}>
+        <View
+          style={[
+            styles.modal,
+            {
+              height: Layout.window.height / 2,
+            },
+          ]}
+        >
+          {internalAllReady ? (
+            <ScrollView>
+              {renderOption('Lesser', BoardVariant.Lesser, 8)}
+              {renderOption('Andean', BoardVariant.Andean, 9)}
+              {renderOption('Chilean', BoardVariant.Chilean, 16)}
+              {renderOption('Caribbean', BoardVariant.Caribbean, 24)}
+              {renderOption('Greater', BoardVariant.Greater, 25)}
+            </ScrollView>
+          ) : (
+            <View
+              style={{
+                alignItems: 'center',
+                flex: 1,
+                justifyContent: 'space-around',
+              }}
+            >
+              <Text>Not everybody's ready. Are you sure?</Text>
+              <Button
+                title="Let's Go!"
+                onPress={() => setInternalAllReady(true)}
+              />
+            </View>
+          )}
+
+          <Button
+            borderless
+            title="Cancel"
+            onPress={loading ? () => {} : onCancel}
+            style={{ alignSelf: 'center' }}
+          />
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
 const LIST_ITEM_HEIGHT = 42;
 
 const styles = StyleSheet.create({
@@ -579,7 +693,7 @@ const styles = StyleSheet.create({
   term: {
     fontFamily: 'Work-Sans',
     fontSize: 17,
-    color: '#F38BA6',
+    color: Colors.primary,
   },
   divider: {
     height: 1,
@@ -592,7 +706,7 @@ const styles = StyleSheet.create({
   subLabel: {
     fontFamily: 'Work-Sans',
     fontSize: 13,
-    color: '#646464',
+    color: Colors.gray,
   },
   modalBackdrop: {
     flex: 1,
@@ -605,7 +719,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
-    alignItems: 'center',
+    alignItems: 'stretch',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -614,5 +728,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  boardOption: {
+    flexDirection: 'row',
+    paddingVertical: 4,
+  },
+  boardOptionLabelContainer: {
+    marginLeft: 20,
+    justifyContent: 'center',
   },
 });

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
-function SvgComponent(props: any) {
+function MafingoLogo(props: any) {
   return (
     <Svg
       width="100%"
@@ -65,4 +65,4 @@ function SvgComponent(props: any) {
   );
 }
 
-export default SvgComponent;
+export default MafingoLogo;

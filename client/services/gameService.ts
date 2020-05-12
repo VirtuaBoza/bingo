@@ -1,8 +1,11 @@
 import { Observable } from 'apollo-link';
 import gql from 'graphql-tag';
 import client from '../apolloClient';
+import { BoardVariant } from '../enums/BoardVariant.enum';
 import { Status } from '../enums/Status.enum';
+import getEnvVars from '../environment';
 import { Game, Term } from '../models';
+import httpClient from '../utils/httpClient';
 
 const GAME = `
 {
@@ -178,9 +181,30 @@ function getMyGames(userId: string): Promise<Game[]> {
     });
 }
 
-// function startGame(gameId) {
-//   httpClient.post(`http://${getEnvVars()?.domain}/startGame?gameId=${gameId}`)
-// }
+function startGame(gameId: string, variant: BoardVariant) {
+  const [size, freeSpace] = getBoardSize(variant);
+  httpClient.post(
+    `http://${
+      getEnvVars()?.domain
+    }/api/startGame?gameId=${gameId}&size=${size}&freeSpace=${freeSpace}`
+  );
+}
+
+function getBoardSize(variant: BoardVariant): [number, boolean] {
+  switch (variant) {
+    case BoardVariant.Lesser:
+      return [3, true];
+    case BoardVariant.Andean:
+      return [3, false];
+    case BoardVariant.Chilean:
+      return [4, false];
+    case BoardVariant.Caribbean:
+      return [5, true];
+    case BoardVariant.Greater:
+    default:
+      return [5, false];
+  }
+}
 
 export default {
   createGame,
@@ -190,4 +214,6 @@ export default {
   deleteTerm,
   upsertGamePlayer,
   getMyGames,
+  getBoardSize,
+  startGame,
 };

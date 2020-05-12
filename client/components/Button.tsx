@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import Colors from '../constants/Colors';
 
 const Button: React.FC<any> = ({
   title,
@@ -31,7 +32,7 @@ export default Button;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F38BA6',
+    backgroundColor: Colors.primary,
     height: 42,
     justifyContent: 'center',
     alignItems: 'center',
@@ -40,19 +41,19 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   disabled: {
-    backgroundColor: '#F7BDC9',
+    backgroundColor: Colors.secondary,
   },
   text: {
     fontFamily: 'Fugaz-One',
-    color: '#FFEEEE',
+    color: Colors.offWhite,
     fontSize: 17,
   },
   borderlessText: {
-    color: '#F38BA6',
+    color: Colors.primary,
     fontFamily: 'Fugaz-One',
     fontSize: 17,
   },
   borderlessDisabled: {
-    color: '#F7BDC9',
+    color: Colors.secondary,
   },
 });

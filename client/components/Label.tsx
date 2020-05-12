@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
+import Colors from '../constants/Colors';
 
 const Label: React.FC<any> = ({ text, style, ...rest }) => {
   return (
@@ -15,6 +16,6 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: 'Fugaz-One',
     fontSize: 17,
-    color: '#646464',
+    color: Colors.gray,
   },
 });

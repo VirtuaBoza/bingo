@@ -24,11 +24,7 @@ export const GameScreen: React.FC<{
       .subscribeToGame(gameFromStore.id)
       .subscribe(
         (gameFromServer) => {
-          if (
-            !updating &&
-            gameFromServer &&
-            JSON.stringify(gameFromServer) !== JSON.stringify(gameFromStore)
-          ) {
+          if (!updating && gameFromServer) {
             updateGameInStore(gameFromServer);
           }
         },

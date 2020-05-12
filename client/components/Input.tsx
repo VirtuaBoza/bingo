@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
+import Colors from '../constants/Colors';
 
 const Input = React.forwardRef<React.Props<TextInput>, any>(
   ({ label, style, ...rest }, ref) => {
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 17,
     fontFamily: 'Fugaz-One',
-    color: '#F38BA6',
+    color: Colors.primary,
     paddingLeft: 16,
     paddingRight: 16,
   },
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontFamily: 'Work-Sans',
     borderRadius: 50,
-    borderColor: '#F38BA6',
+    borderColor: Colors.primary,
     borderStyle: 'solid',
     borderWidth: 1,
     height: 42,

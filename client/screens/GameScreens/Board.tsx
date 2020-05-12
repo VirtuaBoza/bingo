@@ -1,11 +1,18 @@
-import React from 'react';
-import { Text, View } from 'react-native';
+import React, { useLayoutEffect } from 'react';
+import { Text } from 'react-native';
+import { PageContainer } from '../../components';
 
-export const GameBoardScreen: React.FC<any> = ({ ...props }) => {
+export const GameBoardScreen: React.FC<any> = ({ navigation, ...props }) => {
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: null,
+    });
+  }, []);
+
   return (
-    <View>
-      <Text>Game Boad</Text>
-    </View>
+    <PageContainer>
+      <Text>Game Board</Text>
+    </PageContainer>
   );
 };
 

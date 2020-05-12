@@ -7,6 +7,7 @@ import * as React from 'react';
 import { Platform, StatusBar } from 'react-native';
 import 'react-native-gesture-handler';
 import ErrorBoundary from './components/ErrorBoundary';
+import Colors from './constants/Colors';
 import Routes from './constants/Routes';
 import useLinking from './navigation/useLinking';
 import GameLobbyScreen from './screens/GameScreen';
@@ -67,7 +68,7 @@ export default function App(props: any) {
           >
             <Stack.Navigator
               screenOptions={{
-                headerTintColor: '#F38BA6',
+                headerTintColor: Colors.primary,
                 headerStyle: {
                   elevation: 0,
                   borderBottomWidth: 0,
