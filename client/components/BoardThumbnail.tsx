@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
+import Colors from '../constants/Colors';
 import { BoardVariant } from '../enums/BoardVariant.enum';
 import { gameService } from '../services';
 import RoundedSquare from '../svg/RoundedSquare';
@@ -12,12 +13,14 @@ export interface BoardThumbnailProps {
   variant: BoardVariant;
   size?: number;
   opacity?: number;
+  color?: string;
 }
 
 const BoardThumbnail: React.FC<BoardThumbnailProps> = ({
   variant,
   size = 72,
   opacity = 1,
+  color = Colors.secondary,
 }) => {
   const [boardSize, freeSpace] = gameService.getBoardSize(variant);
   const cellSize = getCellSize(boardSize, size);
@@ -29,7 +32,7 @@ const BoardThumbnail: React.FC<BoardThumbnailProps> = ({
           {arr.map((_, colIndex) => (
             <View key={colIndex} style={styles.cell}>
               <RoundedSquare
-                fill="#F7BDC9"
+                fill={color}
                 fillOpacity={
                   freeSpace &&
                   boardSize % 2 !== 0 &&

@@ -21,7 +21,7 @@ export default {
       },
       body: JSON.stringify(body || {}),
     }).then((res) => {
-      if (res.ok) return res.json();
+      if (res.ok) return res.status === 204 ? true : res.json();
       throw new Error(res as any);
     });
   },

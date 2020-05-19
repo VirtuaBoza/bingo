@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import Colors from '../constants/Colors';
+import Text from './Text';
 
 const Button: React.FC<any> = ({
   title,
@@ -12,7 +13,9 @@ const Button: React.FC<any> = ({
   return borderless ? (
     <TouchableOpacity onPress={onPress} disabled={disabled} style={style}>
       <Text
-        style={[styles.borderlessText, disabled && styles.borderlessDisabled]}
+        font="display"
+        size={17}
+        color={disabled ? Colors.secondary : Colors.primary}
       >
         {title}
       </Text>
@@ -23,7 +26,9 @@ const Button: React.FC<any> = ({
       disabled={disabled}
       style={[styles.container, style, disabled && styles.disabled]}
     >
-      <Text style={styles.text}>{title}</Text>
+      <Text font="display" size={17} color={Colors.offWhite}>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -42,18 +47,5 @@ const styles = StyleSheet.create({
   },
   disabled: {
     backgroundColor: Colors.secondary,
-  },
-  text: {
-    fontFamily: 'Fugaz-One',
-    color: Colors.offWhite,
-    fontSize: 17,
-  },
-  borderlessText: {
-    color: Colors.primary,
-    fontFamily: 'Fugaz-One',
-    fontSize: 17,
-  },
-  borderlessDisabled: {
-    color: Colors.secondary,
   },
 });

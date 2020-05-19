@@ -4,4 +4,6 @@ export { default as Input } from './Input';
 export { default as Label } from './Label';
 export { default as PageContainer } from './PageContainer';
 export { default as Stack } from './Stack';
+export { default as Text } from './Text';
 export { default as Title } from './Title';
+export { default as ToggleButton } from './ToggleButton';

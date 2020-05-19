@@ -1,0 +1,6 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: ALTER TABLE "public"."game_players" ADD COLUMN "winner" boolean NOT NULL
+      DEFAULT false;
+  type: run_sql

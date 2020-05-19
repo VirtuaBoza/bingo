@@ -1,3 +1,4 @@
+import { isEqual } from 'apollo-utilities';
 import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { Status } from '../enums/Status.enum';
@@ -24,7 +25,11 @@ export const GameScreen: React.FC<{
       .subscribeToGame(gameFromStore.id)
       .subscribe(
         (gameFromServer) => {
-          if (!updating && gameFromServer) {
+          if (
+            !updating &&
+            gameFromServer &&
+            !isEqual(gameFromStore, gameFromServer)
+          ) {
             updateGameInStore(gameFromServer);
           }
         },
@@ -35,22 +40,17 @@ export const GameScreen: React.FC<{
     return () => {
       subscription.unsubscribe();
     };
-  });
+  }, [updating, gameFromStore, updateGameInStore]);
 
   if (gameFromStore) {
     switch (gameFromStore.status) {
       case Status.Unstarted:
         return <GameLobbyScreen {...rest} setUpdating={setUpdating} />;
       case Status.Building:
-        return <GameBuildingScreen {...rest} setUpdating={setUpdating} />;
+        return <GameBuildingScreen {...rest} />;
       case Status.Started:
-        return <GameBoardScreen {...rest} setUpdating={setUpdating} />;
       case Status.Finished:
-        return (
-          <View>
-            <Text>Finished</Text>
-          </View>
-        );
+        return <GameBoardScreen {...rest} setUpdating={setUpdating} />;
       default:
         break;
     }

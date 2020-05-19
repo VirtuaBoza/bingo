@@ -1,5 +1,6 @@
 import gql from 'graphql-tag';
 import { BoardMakingData } from 'src/models';
+import TermMarkingGame from 'src/models/TermMarkingGame.model';
 import client from '../apolloClient';
 import { GameStatus } from '../enums/GameStatus.enum';
 
@@ -70,6 +71,60 @@ const gameService = {
                 game_id: { _eq: $gameId }
                 player_id: { _eq: $playerId }
               }
+            ) {
+              affected_rows
+            }
+          }
+        `,
+      })
+      .then((res) => {
+        if (res.errors) throw res.errors;
+        return Boolean(res.data.update_game_players.affected_rows);
+      });
+  },
+  markTerm(termId: string, userId: string): Promise<TermMarkingGame> {
+    return client
+      .mutate({
+        fetchPolicy: 'no-cache',
+        variables: { termId, userId },
+        mutation: gql`
+          mutation MarkTerm($termId: uuid!, $userId: uuid!) {
+            update_terms(
+              where: { id: { _eq: $termId } }
+              _set: { marked_by: $userId }
+            ) {
+              returning {
+                game {
+                  id
+                  terms {
+                    id
+                    marked_by
+                  }
+                  game_players {
+                    player_id
+                    board
+                  }
+                }
+              }
+            }
+          }
+        `,
+      })
+      .then((res) => {
+        if (res.errors) throw res.errors;
+        return res.data.update_terms.returning[0]?.game;
+      });
+  },
+  markAsWinner(playerId: string): Promise<boolean> {
+    return client
+      .mutate({
+        fetchPolicy: 'no-cache',
+        variables: { playerId },
+        mutation: gql`
+          mutation MarkAsWinner($playerId: uuid!) {
+            update_game_players(
+              where: { player_id: { _eq: $playerId } }
+              _set: { winner: true }
             ) {
               affected_rows
             }

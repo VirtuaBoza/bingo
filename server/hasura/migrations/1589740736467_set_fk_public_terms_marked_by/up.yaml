@@ -1,0 +1,10 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: |-
+      alter table "public"."terms"
+                 add constraint "terms_marked_by_fkey"
+                 foreign key ("marked_by")
+                 references "public"."players"
+                 ("id") on update restrict on delete restrict;
+  type: run_sql

@@ -1,0 +1,5 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: ALTER TABLE "public"."terms" DROP COLUMN "marked_by";
+  type: run_sql

@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 
 const ENV = {
   dev: {
-    domain: '192.168.1.2:8080',
+    domain: '192.168.1.3:8080',
   },
   staging: {
     domain: '[your.staging.api.here]',

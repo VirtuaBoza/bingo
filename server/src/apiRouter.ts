@@ -1,5 +1,6 @@
 import express from 'express';
 import { GameStatus } from './enums/GameStatus.enum';
+import didIWin from './services/didIWin';
 import { createGameBoard, getRequiredTermsLength } from './services/gameMaker';
 import gameService from './services/gameService';
 
@@ -41,6 +42,42 @@ router.post('/startGame', async function (req, res) {
     }
 
     await gameService.setGameStatus(gameId, GameStatus.Started);
+
+    res.status(204).send();
+  }
+});
+
+router.post('/markTerm', async function (req, res) {
+  let { termId, userId } = req.query as {
+    termId?: string;
+    userId?: string;
+  };
+
+  const game = await gameService.markTerm(termId, userId);
+
+  if (!game) {
+    res.status(400).send('Bad Request');
+  } else {
+    const winningTerms = game.terms.reduce((acc, cur) => {
+      if (cur.marked_by) {
+        acc[cur.id] = true;
+      }
+      return acc;
+    }, {} as { [id: string]: boolean });
+
+    let weHaveAWinner = false;
+
+    game.game_players.forEach(async (gp) => {
+      const won = didIWin(gp.board, winningTerms);
+      if (won) {
+        weHaveAWinner = true;
+        await gameService.markAsWinner(gp.player_id);
+      }
+    });
+
+    if (weHaveAWinner) {
+      await gameService.setGameStatus(game.id, GameStatus.Finished);
+    }
 
     res.status(204).send();
   }

@@ -1,0 +1,5 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: alter table "public"."terms" drop constraint "terms_marked_by_fkey";
+  type: run_sql

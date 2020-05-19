@@ -20,6 +20,7 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import { Button, Label, PageContainer, Title } from '../../components';
 import BoardThumbnail from '../../components/BoardThumbnail';
 import Colors from '../../constants/Colors';
+import Fonts from '../../constants/Fonts';
 import Layout from '../../constants/Layout';
 import Routes from '../../constants/Routes';
 import { BoardVariant } from '../../enums/BoardVariant.enum';
@@ -691,7 +692,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   term: {
-    fontFamily: 'Work-Sans',
+    fontFamily: Fonts.text,
     fontSize: 17,
     color: Colors.primary,
   },
@@ -704,7 +705,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   subLabel: {
-    fontFamily: 'Work-Sans',
+    fontFamily: Fonts.text,
     fontSize: 13,
     color: Colors.gray,
   },

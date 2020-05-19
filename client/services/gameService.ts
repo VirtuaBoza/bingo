@@ -15,6 +15,8 @@ const GAME = `
   terms(order_by: {created_at: asc}) {
     id
     text
+    updated_at
+    marked_by
   }
   game_players(order_by: {created_at: asc}) {
     player {
@@ -22,6 +24,8 @@ const GAME = `
       username
     }
     ready
+    board
+    winner
   }
   game_master_id
 }
@@ -181,9 +185,9 @@ function getMyGames(userId: string): Promise<Game[]> {
     });
 }
 
-function startGame(gameId: string, variant: BoardVariant) {
+function startGame(gameId: string, variant: BoardVariant): Promise<any> {
   const [size, freeSpace] = getBoardSize(variant);
-  httpClient.post(
+  return httpClient.post(
     `http://${
       getEnvVars()?.domain
     }/api/startGame?gameId=${gameId}&size=${size}&freeSpace=${freeSpace}`
@@ -206,6 +210,14 @@ function getBoardSize(variant: BoardVariant): [number, boolean] {
   }
 }
 
+function markTerm(termId: string, userId: string): Promise<any> {
+  return httpClient.post(
+    `http://${
+      getEnvVars()?.domain
+    }/api/markTerm?termId=${termId}&userId=${userId}`
+  );
+}
+
 export default {
   createGame,
   getGame,
@@ -216,4 +228,5 @@ export default {
   getMyGames,
   getBoardSize,
   startGame,
+  markTerm,
 };

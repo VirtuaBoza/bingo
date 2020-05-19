@@ -2,8 +2,10 @@ import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { PageContainer } from '../../components';
 import Colors from '../../constants/Colors';
+import { useClearHeaderButton } from '../../hooks';
 
-export const GameBuildingScreen: React.FC<any> = ({ ...props }) => {
+export const GameBuildingScreen: React.FC<any> = ({ navigation, ...props }) => {
+  useClearHeaderButton(navigation);
   return (
     <PageContainer>
       <View style={{ flex: 1, justifyContent: 'center' }}>
