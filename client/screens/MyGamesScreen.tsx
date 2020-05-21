@@ -43,6 +43,11 @@ export const MyGamesScreen: React.FC<{
 
   const activeGames = games.filter((g) => g.status !== Status.Finished);
   const completedGames = games.filter((g) => g.status === Status.Finished);
+  const myRecord = completedGames.map(
+    (g) => g.game_players.find((gp) => gp.player.id === user.id)!.winner
+  );
+  const wins = myRecord.filter(Boolean).length;
+  const losses = myRecord.length - wins;
 
   return (
     <PageContainer>
@@ -64,25 +69,29 @@ export const MyGamesScreen: React.FC<{
             <View style={styles.statContainer}>
               <Text font="display">Wins</Text>
               <Text font="display" color={Colors.primary}>
-                0
+                {wins}
               </Text>
             </View>
             <View style={styles.statContainer}>
               <Text font="display">Losses</Text>
               <Text font="display" color={Colors.primary}>
-                1
+                {losses}
               </Text>
             </View>
             <View style={styles.statContainer}>
               <Text font="display">W/L</Text>
               <Text font="display" color={Colors.primary}>
-                2
+                {!losses
+                  ? wins
+                    ? '1.0'
+                    : ''
+                  : (Math.round(10 * (wins / losses)) / 10).toFixed(1)}
               </Text>
             </View>
             <View style={styles.statContainer}>
               <Text font="display">Streak</Text>
               <Text font="display" color={Colors.primary}>
-                3
+                {gameService.getStreak(myRecord)}
               </Text>
             </View>
           </View>

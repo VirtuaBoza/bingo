@@ -1,8 +1,7 @@
-import { BoardVariant } from '@abizzle/mafingo-core';
+import { BoardVariant, getBoardSize } from '@abizzle/mafingo-core';
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Colors from '../constants/Colors';
-import { gameService } from '../services';
 import RoundedSquare from '../svg/RoundedSquare';
 
 function getCellSize(boardSize: number, thumbnailSize: number) {
@@ -22,7 +21,7 @@ const BoardThumbnail: React.FC<BoardThumbnailProps> = ({
   opacity = 1,
   color = Colors.secondary,
 }) => {
-  const [boardSize, freeSpace] = gameService.getBoardSize(variant);
+  const [boardSize, freeSpace] = getBoardSize(variant);
   const cellSize = getCellSize(boardSize, size);
   const arr = Array(boardSize).fill(1);
   return (

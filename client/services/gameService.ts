@@ -197,28 +197,31 @@ function startGame(gameId: string, variant: BoardVariant): Promise<any> {
   );
 }
 
-function getBoardSize(variant: BoardVariant): [number, boolean] {
-  switch (variant) {
-    case BoardVariant.Lesser:
-      return [3, true];
-    case BoardVariant.Andean:
-      return [3, false];
-    case BoardVariant.Chilean:
-      return [4, false];
-    case BoardVariant.Caribbean:
-      return [5, true];
-    case BoardVariant.Greater:
-    default:
-      return [5, false];
-  }
-}
-
 function markTerm(termId: string, userId: string): Promise<any> {
   return httpClient.post(
     `http://${
       getEnvVars()?.domain
     }/api/markTerm?termId=${termId}&userId=${userId}`
   );
+}
+
+function getStreak(record: boolean[]): number {
+  if (!record.length) return 0;
+
+  let highestCount = 0;
+  let currentCount = 0;
+  record.forEach((r) => {
+    if (r) {
+      currentCount++;
+      if (currentCount > highestCount) {
+        highestCount = currentCount;
+      }
+    } else {
+      currentCount = 0;
+    }
+  });
+
+  return highestCount;
 }
 
 export default {
@@ -229,7 +232,7 @@ export default {
   deleteTerm,
   upsertGamePlayer,
   getMyGames,
-  getBoardSize,
   startGame,
   markTerm,
+  getStreak,
 };
