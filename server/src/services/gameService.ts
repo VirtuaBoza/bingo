@@ -1,4 +1,5 @@
 import gql from 'graphql-tag';
+import { BoardVariant } from 'src/enums/BoardVariant.enum';
 import { BoardMakingData } from 'src/models';
 import TermMarkingGame from 'src/models/TermMarkingGame.model';
 import client from '../apolloClient';
@@ -29,6 +30,26 @@ const gameService = {
       .then((res) => {
         if (res.errors) throw res.errors;
         return res.data.games_by_pk;
+      });
+  },
+  setGameVariant(gameId: string, variant: BoardVariant): Promise<boolean> {
+    return client
+      .mutate({
+        variables: { gameId, variant },
+        mutation: gql`
+          mutation SetVariant($gameId: String!, $variant: game_status_enum!) {
+            update_games(
+              where: { id: { _eq: $gameId } }
+              _set: { variant: $variant }
+            ) {
+              affected_rows
+            }
+          }
+        `,
+      })
+      .then((res) => {
+        if (res.errors) throw res.errors;
+        return Boolean(res.data.update_games.affected_rows);
       });
   },
   setGameStatus(gameId: string, status: GameStatus): Promise<boolean> {

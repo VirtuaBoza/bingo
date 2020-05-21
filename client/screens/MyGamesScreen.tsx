@@ -5,7 +5,7 @@ import { PageContainer, Stack, Text, Title, ToggleButton } from '../components';
 import BoardThumbnail from '../components/BoardThumbnail';
 import Colors from '../constants/Colors';
 import Routes from '../constants/Routes';
-import { BoardVariant, Status } from '../enums';
+import { Status } from '../enums';
 import { usePromise } from '../hooks';
 import { Game, User } from '../models';
 import { gameService } from '../services';
@@ -41,6 +41,9 @@ export const MyGamesScreen: React.FC<{
     navigation.navigate(Routes.Lobby, { gameId: game.id });
   }
 
+  const activeGames = games.filter((g) => g.status !== Status.Finished);
+  const completedGames = games.filter((g) => g.status === Status.Finished);
+
   return (
     <PageContainer>
       <Stack>
@@ -51,31 +54,78 @@ export const MyGamesScreen: React.FC<{
           value={state}
           onPress={setState}
         />
+        {state === states.completed && (
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+            }}
+          >
+            <View style={styles.statContainer}>
+              <Text font="display">Wins</Text>
+              <Text font="display" color={Colors.primary}>
+                0
+              </Text>
+            </View>
+            <View style={styles.statContainer}>
+              <Text font="display">Losses</Text>
+              <Text font="display" color={Colors.primary}>
+                1
+              </Text>
+            </View>
+            <View style={styles.statContainer}>
+              <Text font="display">W/L</Text>
+              <Text font="display" color={Colors.primary}>
+                2
+              </Text>
+            </View>
+            <View style={styles.statContainer}>
+              <Text font="display">Streak</Text>
+              <Text font="display" color={Colors.primary}>
+                3
+              </Text>
+            </View>
+          </View>
+        )}
       </Stack>
       <View style={styles.listContainer}>
         <FlatList
-          data={games.filter((g) =>
-            state === states.active
-              ? g.status !== Status.Finished
-              : g.status === Status.Finished
-          )}
+          data={state === states.active ? activeGames : completedGames}
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           renderItem={({ item: game }) => (
             <TouchableOpacity
               onPress={() => handleGamePress(game)}
               style={styles.listItem}
             >
-              <View style={{ height: 50, width: 75, alignItems: 'center' }}>
-                {[Status.Unstarted, Status.Building].includes(game.status) ? (
-                  <Mafingo />
-                ) : (
+              <View style={{ height: 50, width: 50, alignItems: 'center' }}>
+                {game.variant ? (
                   <BoardThumbnail
-                    variant={BoardVariant.Andean}
+                    variant={game.variant}
                     size={50}
                     color={Colors.secondary}
                   />
+                ) : (
+                  <Mafingo />
                 )}
               </View>
-              <Text>{game.name}</Text>
+              <View
+                style={{
+                  paddingLeft: 25,
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Text>{game.name}</Text>
+                {game.status === Status.Finished && (
+                  <Text font="display" color={Colors.primary}>
+                    {game.game_players.find((gp) => gp.player.id === user.id)
+                      ?.winner
+                      ? 'Win!'
+                      : 'Loss'}
+                  </Text>
+                )}
+              </View>
             </TouchableOpacity>
           )}
           keyExtractor={(game) => game.id}
@@ -95,9 +145,13 @@ const styles = StyleSheet.create({
   },
   listItem: {
     height: 75,
+    paddingHorizontal: 25,
     backgroundColor: Colors.lightPink,
     borderRadius: 10,
     flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statContainer: {
     alignItems: 'center',
   },
 });

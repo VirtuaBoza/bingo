@@ -701,7 +701,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(128, 128, 128, 0.2)',
   },
   playerContainer: {
-    width: 60,
+    minWidth: 60,
+    maxWidth: 80,
     alignItems: 'center',
   },
   subLabel: {

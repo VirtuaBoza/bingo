@@ -1,0 +1,5 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: INSERT INTO game_variant (value) VALUES ('Lesser'),('Andean'),('Chilean'),('Caribbean'),('Greater');
+  type: run_sql

@@ -1,4 +1,3 @@
-import { isEqual } from 'apollo-utilities';
 import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { Status } from '../enums/Status.enum';
@@ -27,8 +26,9 @@ export const GameScreen: React.FC<{
         (gameFromServer) => {
           if (
             !updating &&
-            gameFromServer &&
-            !isEqual(gameFromStore, gameFromServer)
+            gameFromServer
+            // This never seems to work right
+            // && !isEqual(gameFromStore, gameFromServer)
           ) {
             updateGameInStore(gameFromServer);
           }
@@ -40,7 +40,7 @@ export const GameScreen: React.FC<{
     return () => {
       subscription.unsubscribe();
     };
-  }, [updating, gameFromStore, updateGameInStore]);
+  }, [gameFromStore, updateGameInStore]);
 
   if (gameFromStore) {
     switch (gameFromStore.status) {

@@ -16,6 +16,10 @@ tables:
   is_enum: true
 - table:
     schema: public
+    name: game_variant
+  is_enum: true
+- table:
+    schema: public
     name: games
   object_relationships:
   - name: game_master
@@ -24,6 +28,9 @@ tables:
   - name: game_status
     using:
       foreign_key_constraint_on: status
+  - name: game_variant
+    using:
+      foreign_key_constraint_on: variant
   array_relationships:
   - name: game_players
     using:

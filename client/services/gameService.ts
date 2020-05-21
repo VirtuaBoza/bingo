@@ -12,6 +12,7 @@ const GAME = `
   id
   name
   status
+  variant
   terms(order_by: {created_at: asc}) {
     id
     text
@@ -186,11 +187,10 @@ function getMyGames(userId: string): Promise<Game[]> {
 }
 
 function startGame(gameId: string, variant: BoardVariant): Promise<any> {
-  const [size, freeSpace] = getBoardSize(variant);
   return httpClient.post(
     `http://${
       getEnvVars()?.domain
-    }/api/startGame?gameId=${gameId}&size=${size}&freeSpace=${freeSpace}`
+    }/api/startGame?gameId=${gameId}&variant=${variant}`
   );
 }
 

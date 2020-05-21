@@ -1,4 +1,5 @@
 import express from 'express';
+import { BoardVariant } from './enums/BoardVariant.enum';
 import { GameStatus } from './enums/GameStatus.enum';
 import didIWin from './services/didIWin';
 import { createGameBoard, getRequiredTermsLength } from './services/gameMaker';
@@ -7,13 +8,14 @@ import gameService from './services/gameService';
 const router = express.Router();
 
 router.post('/startGame', async function (req, res) {
-  let { gameId, size, freeSpace } = req.query as any;
-  size = Number(size);
-  freeSpace = /^(1|true)$/i.test(freeSpace);
+  let { gameId, variant } = req.query as {
+    gameId?: string;
+    variant?: BoardVariant;
+  };
 
   if (!gameId) {
     res.status(400).send('Bad Request');
-  } else if (isNaN(size) || size < 3 || size > 5) {
+  } else if (!Object.values(BoardVariant).includes(variant)) {
     res.status(400).send('Bad Request');
   } else {
     const game = await gameService.getBoardMakingData(gameId);
@@ -21,7 +23,7 @@ router.post('/startGame', async function (req, res) {
     if (
       !game ||
       game.status !== GameStatus.Unstarted ||
-      game.terms.length < getRequiredTermsLength(size, freeSpace)
+      game.terms.length < getRequiredTermsLength(variant)
     ) {
       res.status(400).send('Bad Request');
     }
@@ -31,8 +33,7 @@ router.post('/startGame', async function (req, res) {
     for (const gamePlayer of game.game_players) {
       const board = createGameBoard(
         game.terms.map((t) => t.id),
-        size,
-        freeSpace
+        variant
       );
       await gameService.updateGamePlayerBoard(
         gameId,
@@ -41,6 +42,7 @@ router.post('/startGame', async function (req, res) {
       );
     }
 
+    await gameService.setGameVariant(gameId, variant);
     await gameService.setGameStatus(gameId, GameStatus.Started);
 
     res.status(204).send();

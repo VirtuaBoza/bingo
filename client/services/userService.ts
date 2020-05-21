@@ -1,15 +1,31 @@
 import { Notifications } from 'expo';
 import * as Device from 'expo-device';
+import * as Permissions from 'expo-permissions';
 import gql from 'graphql-tag';
 import client from '../apolloClient';
 import { User } from '../models';
 
-export default {
-  addUser: async (username: string): Promise<User> => {
-    let token = null;
-    if (Device.isDevice) {
+async function getToken(): Promise<string | null> {
+  let token = null;
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Permissions.getAsync(
+      Permissions.NOTIFICATIONS
+    );
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+    if (finalStatus === 'granted') {
       token = await Notifications.getExpoPushTokenAsync();
     }
+  }
+  return token;
+}
+
+export default {
+  addUser: async (username: string): Promise<User> => {
+    const token = await getToken();
 
     return client
       .mutate({

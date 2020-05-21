@@ -24,8 +24,17 @@ export const GameBoardScreen: React.FC<{
   game: Game;
   user: User;
   setUpdating: (updating: boolean) => any;
-}> = ({ navigation, game, user, setUpdating, ...props }) => {
+}> = ({ navigation, game, user, setUpdating }) => {
   useClearHeaderButton(navigation);
+
+  React.useLayoutEffect(() => {
+    if (game.status === Status.Finished) {
+      navigation.setOptions({
+        headerLeft: null,
+      });
+    }
+  }, [game.status]);
+
   const myBoard = game.game_players.find((gp) => gp.player.id === user.id)
     ?.board;
 

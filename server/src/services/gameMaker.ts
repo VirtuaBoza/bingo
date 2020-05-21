@@ -1,26 +1,43 @@
-export function getRequiredTermsLength(
-  size: number,
-  freeSpace: boolean
-): number {
-  switch (size) {
-    case 3:
-      if (freeSpace) return 8;
+import { BoardVariant } from '../enums/BoardVariant.enum';
+
+export function getRequiredTermsLength(variant: BoardVariant): number {
+  switch (variant) {
+    case BoardVariant.Lesser:
+      return 8;
+    case BoardVariant.Andean:
       return 9;
-    case 4:
+    case BoardVariant.Chilean:
       return 16;
-    case 5:
-      if (freeSpace) return 24;
+    case BoardVariant.Caribbean:
+      return 24;
+    case BoardVariant.Greater:
       return 25;
     default:
       throw new Error('Invalid size passed to getRequiredTermsLength');
   }
 }
 
+export function getBoardSize(variant: BoardVariant): [number, boolean] {
+  switch (variant) {
+    case BoardVariant.Lesser:
+      return [3, true];
+    case BoardVariant.Andean:
+      return [3, false];
+    case BoardVariant.Chilean:
+      return [4, false];
+    case BoardVariant.Caribbean:
+      return [5, true];
+    case BoardVariant.Greater:
+    default:
+      return [5, false];
+  }
+}
+
 export function createGameBoard(
   termIds: string[],
-  size: number,
-  freeSpace: boolean
+  variant: BoardVariant
 ): string[][] {
+  const [size, freeSpace] = getBoardSize(variant);
   const remainingTermIds = [...termIds];
   const board: string[][] = [];
 

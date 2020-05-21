@@ -1,0 +1,10 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: |-
+      alter table "public"."games"
+                 add constraint "games_variant_fkey"
+                 foreign key ("variant")
+                 references "public"."game_variant"
+                 ("value") on update cascade on delete set null;
+  type: run_sql
