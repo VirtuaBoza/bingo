@@ -1,9 +1,7 @@
 import gql from 'graphql-tag';
-import { BoardVariant } from 'src/enums/BoardVariant.enum';
-import { BoardMakingData } from 'src/models';
-import TermMarkingGame from 'src/models/TermMarkingGame.model';
+import { BoardVariant, GameStatus } from 'mafingo-core';
 import client from '../apolloClient';
-import { GameStatus } from '../enums/GameStatus.enum';
+import { BoardMakingData, TermMarkingGame } from '../models';
 
 const gameService = {
   getBoardMakingData(gameId: string): Promise<BoardMakingData> {

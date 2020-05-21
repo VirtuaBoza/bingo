@@ -1,4 +1,5 @@
 import { NavigationProp } from '@react-navigation/native';
+import { Game, GameStatus as Status, Term } from 'mafingo-core';
 import React, { useState } from 'react';
 import {
   FlatList,
@@ -11,9 +12,8 @@ import { Button, PageContainer, Stack, Text, Title } from '../../components';
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout';
 import Routes from '../../constants/Routes';
-import { Status } from '../../enums';
 import { useClearHeaderButton } from '../../hooks';
-import { Game, Term, User } from '../../models';
+import { User } from '../../models';
 import { gameService } from '../../services';
 import { connect, selectGameById, selectUser } from '../../store';
 import Mafingo from '../../svg/Mafingo';

@@ -1,3 +1,4 @@
+import { Game, GameStatus as Status } from 'mafingo-core';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -5,9 +6,8 @@ import { PageContainer, Stack, Text, Title, ToggleButton } from '../components';
 import BoardThumbnail from '../components/BoardThumbnail';
 import Colors from '../constants/Colors';
 import Routes from '../constants/Routes';
-import { Status } from '../enums';
 import { usePromise } from '../hooks';
-import { Game, User } from '../models';
+import { User } from '../models';
 import { gameService } from '../services';
 import { connect, selectGames, selectUser } from '../store';
 import {

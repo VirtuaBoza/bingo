@@ -1,10 +1,8 @@
 import { Observable } from 'apollo-link';
 import gql from 'graphql-tag';
+import { BoardVariant, Game, GameStatus as Status, Term } from 'mafingo-core';
 import client from '../apolloClient';
-import { BoardVariant } from '../enums/BoardVariant.enum';
-import { Status } from '../enums/Status.enum';
 import getEnvVars from '../environment';
-import { Game, Term } from '../models';
 import httpClient from '../utils/httpClient';
 
 const GAME = `

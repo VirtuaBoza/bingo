@@ -1,4 +1,4 @@
-import { BoardVariant } from '../enums/BoardVariant.enum';
+import { BoardVariant, getBoardSize } from 'mafingo-core';
 
 export function getRequiredTermsLength(variant: BoardVariant): number {
   switch (variant) {
@@ -14,22 +14,6 @@ export function getRequiredTermsLength(variant: BoardVariant): number {
       return 25;
     default:
       throw new Error('Invalid size passed to getRequiredTermsLength');
-  }
-}
-
-export function getBoardSize(variant: BoardVariant): [number, boolean] {
-  switch (variant) {
-    case BoardVariant.Lesser:
-      return [3, true];
-    case BoardVariant.Andean:
-      return [3, false];
-    case BoardVariant.Chilean:
-      return [4, false];
-    case BoardVariant.Caribbean:
-      return [5, true];
-    case BoardVariant.Greater:
-    default:
-      return [5, false];
   }
 }
 

@@ -1,7 +1,6 @@
+import { Game, GameStatus as Status } from 'mafingo-core';
 import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
-import { Status } from '../enums/Status.enum';
-import { Game } from '../models';
 import { gameService } from '../services';
 import { connect, selectGameById } from '../store';
 import {

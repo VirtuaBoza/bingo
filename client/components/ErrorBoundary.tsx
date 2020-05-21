@@ -1,13 +1,10 @@
 import * as React from 'react';
-import { View, Text } from 'react-native';
+import { Text, View } from 'react-native';
 
 class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
+  state = { hasError: false };
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: unknown) {
     return { hasError: true };
   }
 

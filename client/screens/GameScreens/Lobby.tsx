@@ -1,6 +1,7 @@
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NavigationProp } from '@react-navigation/native';
 import { Linking } from 'expo';
+import { BoardVariant, Game, GamePlayer, Term } from 'mafingo-core';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -23,9 +24,8 @@ import Colors from '../../constants/Colors';
 import Fonts from '../../constants/Fonts';
 import Layout from '../../constants/Layout';
 import Routes from '../../constants/Routes';
-import { BoardVariant } from '../../enums/BoardVariant.enum';
 import { useKeyboardEvent } from '../../hooks';
-import { Game, GamePlayer, Term, User } from '../../models';
+import { User } from '../../models';
 import { gameService } from '../../services';
 import { connect, selectGameById, selectUser } from '../../store';
 import {

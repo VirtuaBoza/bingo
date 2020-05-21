@@ -1,9 +1,9 @@
 import { BoardVariant } from '../enums';
-import { Status } from '../enums/Status.enum';
-import GamePlayer from './GamePlayer.model';
-import Term from './Term.model';
+import { GameStatus as Status } from '../enums/GameStatus.enum';
+import { GamePlayer } from './GamePlayer.model';
+import { Term } from './Term.model';
 
-export default interface Game {
+export interface Game {
   id: string;
   name: string;
   status: Status;

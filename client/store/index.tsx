@@ -1,7 +1,7 @@
+import { Game } from 'mafingo-core';
 import React, { ComponentType, useContext, useEffect, useReducer } from 'react';
 import { AppState, AsyncStorage } from 'react-native';
 import { storeKey } from '../constants/Keys';
-import Game from '../models/Game.model';
 import User from '../models/User.model';
 import Action from './Action.model';
 import {

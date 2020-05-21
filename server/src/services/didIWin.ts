@@ -1,4 +1,4 @@
-import Board from 'src/models/Board.model';
+import { Board } from 'mafingo-core';
 
 export default function didIWin(
   board: Board,

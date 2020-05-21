@@ -1,6 +1,5 @@
 import express from 'express';
-import { BoardVariant } from './enums/BoardVariant.enum';
-import { GameStatus } from './enums/GameStatus.enum';
+import { BoardVariant, GameStatus } from 'mafingo-core';
 import didIWin from './services/didIWin';
 import { createGameBoard, getRequiredTermsLength } from './services/gameMaker';
 import gameService from './services/gameService';

@@ -1,4 +1,4 @@
-import { Game, Term } from '../../models';
+import { Game, Term } from 'mafingo-core';
 import Action from '../Action.model';
 
 const GAMES_GAME_CREATED_OR_UPDATED = 'GAMES_GAME_CREATED_OR_UPDATED';

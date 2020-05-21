@@ -1,4 +1,4 @@
-import { GameStatus } from 'src/enums/GameStatus.enum';
+import { GameStatus } from 'mafingo-core/src/enums/GameStatus.enum';
 
 export interface BoardMakingData {
   status: GameStatus;

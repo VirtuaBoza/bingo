@@ -1,4 +1,4 @@
-export default interface Player {
+export interface Player {
   id: string;
   username: string;
 }

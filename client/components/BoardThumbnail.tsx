@@ -1,7 +1,7 @@
+import { BoardVariant } from 'mafingo-core';
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Colors from '../constants/Colors';
-import { BoardVariant } from '../enums/BoardVariant.enum';
 import { gameService } from '../services';
 import RoundedSquare from '../svg/RoundedSquare';
 

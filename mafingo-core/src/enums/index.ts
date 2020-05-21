@@ -1,2 +1,2 @@
 export * from './BoardVariant.enum';
-export * from './Status.enum';
+export * from './GameStatus.enum';
