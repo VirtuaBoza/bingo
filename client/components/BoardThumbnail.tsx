@@ -1,4 +1,4 @@
-import { BoardVariant } from 'mafingo-core';
+import { BoardVariant } from '@abizzle/mafingo-core';
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Colors from '../constants/Colors';

@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@abizzle/mafingo-core@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@abizzle/mafingo-core/-/mafingo-core-1.0.0.tgz#d53067bc1c78c0251d1ae08a50658901a9f73b23"
+  integrity sha512-9XmbSfTj18S9YaAgyyzum8aKBAewRHS8lPRNFGGESoDuhvR1iKwlCfLrUhQhHNmEoch1tovxTc+js+CbLKt3Og==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.8.3":
   version "7.8.3"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.8.3.tgz#33e25903d7481181534e12ec0a25f16b6fcf419e"

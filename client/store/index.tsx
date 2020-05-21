@@ -1,4 +1,4 @@
-import { Game } from 'mafingo-core';
+import { Game } from '@abizzle/mafingo-core';
 import React, { ComponentType, useContext, useEffect, useReducer } from 'react';
 import { AppState, AsyncStorage } from 'react-native';
 import { storeKey } from '../constants/Keys';

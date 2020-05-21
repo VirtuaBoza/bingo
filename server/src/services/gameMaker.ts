@@ -1,4 +1,4 @@
-import { BoardVariant, getBoardSize } from 'mafingo-core';
+import { BoardVariant, getBoardSize } from '@abizzle/mafingo-core';
 
 export function getRequiredTermsLength(variant: BoardVariant): number {
   switch (variant) {

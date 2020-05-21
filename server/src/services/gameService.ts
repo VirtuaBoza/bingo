@@ -1,5 +1,5 @@
+import { BoardVariant, GameStatus } from '@abizzle/mafingo-core';
 import gql from 'graphql-tag';
-import { BoardVariant, GameStatus } from 'mafingo-core';
 import client from '../apolloClient';
 import { BoardMakingData, TermMarkingGame } from '../models';
 

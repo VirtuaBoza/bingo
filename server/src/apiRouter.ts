@@ -1,5 +1,5 @@
+import { BoardVariant, GameStatus } from '@abizzle/mafingo-core';
 import express from 'express';
-import { BoardVariant, GameStatus } from 'mafingo-core';
 import didIWin from './services/didIWin';
 import { createGameBoard, getRequiredTermsLength } from './services/gameMaker';
 import gameService from './services/gameService';

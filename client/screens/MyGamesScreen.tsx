@@ -1,4 +1,4 @@
-import { Game, GameStatus as Status } from 'mafingo-core';
+import { Game, GameStatus as Status } from '@abizzle/mafingo-core';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';

@@ -1,4 +1,4 @@
-import Board from 'src/models/Board.model';
+import { Board } from '@abizzle/mafingo-core';
 import didIWin from './didIWin';
 
 describe('didIWin', () => {

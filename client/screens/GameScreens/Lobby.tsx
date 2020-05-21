@@ -1,7 +1,7 @@
+import { BoardVariant, Game, GamePlayer, Term } from '@abizzle/mafingo-core';
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NavigationProp } from '@react-navigation/native';
 import { Linking } from 'expo';
-import { BoardVariant, Game, GamePlayer, Term } from 'mafingo-core';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Animated,

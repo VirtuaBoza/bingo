@@ -1,4 +1,4 @@
-import { Board } from 'mafingo-core';
+import { Board } from '@abizzle/mafingo-core';
 
 export default function didIWin(
   board: Board,

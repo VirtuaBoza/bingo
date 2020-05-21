@@ -1,5 +1,5 @@
+import { Game, GameStatus as Status, Term } from '@abizzle/mafingo-core';
 import { NavigationProp } from '@react-navigation/native';
-import { Game, GameStatus as Status, Term } from 'mafingo-core';
 import React, { useState } from 'react';
 import {
   FlatList,
