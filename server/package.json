@@ -1,8 +1,9 @@
 {
   "main": "dist/index.js",
   "scripts": {
-    "start": "run-p build:watch nodemon",
+    "start": "pm2 start .",
     "nodemon": "nodemon .",
+    "build": "tsc",
     "build:watch": "tsc --watch",
     "hasura": "hasura console --project hasura/",
     "test": "jest --watch"
@@ -36,6 +37,7 @@
     "graphql": "14.6.0",
     "graphql-tag": "^2.10.3",
     "http-proxy-middleware": "^1.0.3",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "pm2": "^4.4.0"
   }
 }

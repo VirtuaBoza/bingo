@@ -42,9 +42,7 @@ function createGame(
 ): Promise<Game> {
   console.log(fromGameId);
   return httpClient.post(
-    `http://${
-      getEnvVars()?.domain
-    }/api/createGame?gameName=${gameName}&userId=${userId}${
+    `${getEnvVars()?.url}/api/createGame?gameName=${gameName}&userId=${userId}${
       fromGameId ? `&gameId=${fromGameId}` : ''
     }`
   );
@@ -182,17 +180,13 @@ function getMyGames(userId: string): Promise<Game[]> {
 
 function startGame(gameId: string, variant: BoardVariant): Promise<any> {
   return httpClient.post(
-    `http://${
-      getEnvVars()?.domain
-    }/api/startGame?gameId=${gameId}&variant=${variant}`
+    `${getEnvVars()?.url}/api/startGame?gameId=${gameId}&variant=${variant}`
   );
 }
 
 function markTerm(termId: string, userId: string): Promise<any> {
   return httpClient.post(
-    `http://${
-      getEnvVars()?.domain
-    }/api/markTerm?termId=${termId}&userId=${userId}`
+    `${getEnvVars()?.url}/api/markTerm?termId=${termId}&userId=${userId}`
   );
 }
 

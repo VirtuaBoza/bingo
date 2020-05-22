@@ -33,7 +33,7 @@ export default new ApolloClient({
         },
       }),
       new HttpLink({
-        uri: `http://${getEnvVars()?.domain}/graphql`,
+        uri: `${getEnvVars()?.url}/graphql`,
       })
     ),
   ]),

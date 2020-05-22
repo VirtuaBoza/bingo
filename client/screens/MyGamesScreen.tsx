@@ -112,13 +112,13 @@ export const MyGamesScreen: React.FC<{
             <View style={styles.statContainer}>
               <Text font="display">Wins</Text>
               <Text font="display" color={Colors.primary}>
-                {wins}
+                {completedGames.length ? wins : '-'}
               </Text>
             </View>
             <View style={styles.statContainer}>
               <Text font="display">Losses</Text>
               <Text font="display" color={Colors.primary}>
-                {losses}
+                {completedGames.length ? losses : '-'}
               </Text>
             </View>
             <View style={styles.statContainer}>
@@ -127,14 +127,14 @@ export const MyGamesScreen: React.FC<{
                 {!losses
                   ? wins
                     ? '1.0'
-                    : ''
+                    : '-'
                   : (Math.round(10 * (wins / losses)) / 10).toFixed(1)}
               </Text>
             </View>
             <View style={styles.statContainer}>
               <Text font="display">Streak</Text>
               <Text font="display" color={Colors.primary}>
-                {gameService.getStreak(myRecord)}
+                {completedGames.length ? gameService.getStreak(myRecord) : '-'}
               </Text>
             </View>
           </View>
