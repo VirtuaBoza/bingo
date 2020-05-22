@@ -1,7 +1,7 @@
 {
   "main": "dist/index.js",
   "scripts": {
-    "start": "pm2 start .",
+    "start": "pm2-runtime start ecosystem.config.js --env production",
     "nodemon": "nodemon .",
     "build": "tsc",
     "build:watch": "tsc --watch",
