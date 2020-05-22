@@ -1,4 +1,4 @@
-import { Board } from 'mafingo-core/src/models/Board.model';
+import { Board } from '@abizzle/mafingo-core';
 
 export interface TermMarkingGame {
   id: string;
