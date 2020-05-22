@@ -1,11 +1,12 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
     "tunnel": "expo start --tunnel",
     "eject": "expo eject",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "expo:publish": "standard-version && expo publish"
   },
   "jest": {
     "preset": "jest-expo"
