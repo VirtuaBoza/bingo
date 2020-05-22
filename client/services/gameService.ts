@@ -35,28 +35,19 @@ const GAME = `
 }
 `;
 
-function createGame(name: string, userId: string): Promise<Game> {
-  return client
-    .mutate({
-      variables: { userId, name },
-      mutation: gql`
-        mutation AddGame($userId: uuid!, $name: String!) {
-          insert_games(
-            objects: {
-              game_master_id: $userId
-              name: $name
-              game_players: { data: { player_id: $userId, ready: true } }
-            }
-          ) {
-            returning ${GAME}
-          }
-        }
-  `,
-    })
-    .then((res) => {
-      if (res.errors) throw res.errors;
-      return res.data.insert_games.returning[0];
-    });
+function createGame(
+  gameName: string,
+  userId: string,
+  fromGameId?: string
+): Promise<Game> {
+  console.log(fromGameId);
+  return httpClient.post(
+    `http://${
+      getEnvVars()?.domain
+    }/api/createGame?gameName=${gameName}&userId=${userId}${
+      fromGameId ? `&gameId=${fromGameId}` : ''
+    }`
+  );
 }
 
 function getGame(id: string): Promise<Game> {

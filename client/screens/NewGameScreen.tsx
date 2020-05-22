@@ -19,8 +19,12 @@ export const NewGameScreen: React.FC<{
   navigation: any;
   setUser: any;
   addGame: any;
-}> = ({ user, navigation, setUser, addGame }) => {
-  const [gameName, setGameName] = useState('');
+  route: any;
+}> = ({ user, navigation, setUser, addGame, route }) => {
+  const fromGameId = route.params?.gameId;
+  const [gameName, setGameName] = useState(
+    (route.params && route.params.gameName) || ''
+  );
   const [internalUserName, setInternalUserName] = useState(user.username || '');
   const ref = useRef<any>();
   const [currentState, transition] = useFormStateMachine();
@@ -47,11 +51,11 @@ export const NewGameScreen: React.FC<{
 
   function createGame(gameName: string, userId: string) {
     gameService
-      .createGame(gameName, userId)
+      .createGame(gameName, userId, fromGameId)
       .then((game) => {
         addGame(game);
         navigation.dispatch(
-          StackActions.replace(Routes.Lobby, { gameId: game.id })
+          StackActions.replace(Routes.Game, { gameId: game.id })
         );
       })
       .catch((err) => {

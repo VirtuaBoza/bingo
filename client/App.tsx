@@ -82,7 +82,7 @@ export default function App(props: any) {
                 options={{ headerShown: false }}
               />
               <Stack.Screen name={Routes.NewGame} component={NewGameScreen} />
-              <Stack.Screen name={Routes.Lobby} component={GameLobbyScreen} />
+              <Stack.Screen name={Routes.Game} component={GameLobbyScreen} />
               <Stack.Screen name={Routes.Games} component={MyGamesScreen} />
               <Stack.Screen name={Routes.JoinGame} component={JoinGameScreen} />
             </Stack.Navigator>

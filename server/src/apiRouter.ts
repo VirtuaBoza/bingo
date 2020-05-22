@@ -6,15 +6,41 @@ import gameService from './services/gameService';
 
 const router = express.Router();
 
+router.post('/createGame', async function (req, res) {
+  const { gameName, userId, gameId } = req.query as {
+    gameName?: string;
+    userId?: string;
+    gameId?: string;
+  };
+
+  if (!gameName || !userId) {
+    res.status(400).send('Bad Request');
+  }
+
+  let game = await gameService.createGame(gameName, userId);
+
+  console.log(gameId);
+  if (gameId) {
+    const fromGame = await gameService.getGame(gameId);
+    console.log(fromGame);
+    if (fromGame) {
+      fromGame.terms.forEach(async (term) => {
+        await gameService.insertTerm(game.id, term.text);
+      });
+      game = await gameService.getGame(game.id);
+    }
+  }
+
+  res.json(game);
+});
+
 router.post('/startGame', async function (req, res) {
   let { gameId, variant } = req.query as {
     gameId?: string;
     variant?: BoardVariant;
   };
 
-  if (!gameId) {
-    res.status(400).send('Bad Request');
-  } else if (!Object.values(BoardVariant).includes(variant)) {
+  if (!gameId || !Object.values(BoardVariant).includes(variant)) {
     res.status(400).send('Bad Request');
   } else {
     const game = await gameService.getBoardMakingData(gameId);

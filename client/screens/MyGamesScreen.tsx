@@ -1,8 +1,15 @@
 import { Game, GameStatus as Status } from '@abizzle/mafingo-core';
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Modal, StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { PageContainer, Stack, Text, Title, ToggleButton } from '../components';
+import {
+  Button,
+  PageContainer,
+  Stack,
+  Text,
+  Title,
+  ToggleButton,
+} from '../components';
 import BoardThumbnail from '../components/BoardThumbnail';
 import Colors from '../constants/Colors';
 import Routes from '../constants/Routes';
@@ -28,6 +35,7 @@ export const MyGamesScreen: React.FC<{
   refreshGames: RefreshGamesActionCreator;
 }> = ({ games, navigation, user, refreshGames }) => {
   const [state, setState] = useState(states.active);
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   usePromise(
     [],
     () =>
@@ -38,7 +46,19 @@ export const MyGamesScreen: React.FC<{
   );
 
   function handleGamePress(game: Game) {
-    navigation.navigate(Routes.Lobby, { gameId: game.id });
+    if (game.status !== Status.Finished) {
+      navigation.navigate(Routes.Game, { gameId: game.id });
+    } else {
+      setSelectedGame(game);
+    }
+  }
+
+  function handleCreateFromGame() {
+    setSelectedGame(null);
+    navigation.navigate(Routes.NewGame, {
+      gameName: selectedGame?.name,
+      gameId: selectedGame?.id,
+    });
   }
 
   const activeGames = games.filter((g) => g.status !== Status.Finished);
@@ -51,6 +71,29 @@ export const MyGamesScreen: React.FC<{
 
   return (
     <PageContainer>
+      <Modal
+        visible={Boolean(selectedGame)}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setSelectedGame(null)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modal}>
+            <Stack>
+              <Text style={{ textAlign: 'center' }}>
+                Play these terms again?
+              </Text>
+              <Button title="Let's Go!" onPress={handleCreateFromGame} />
+              <Button
+                borderless
+                title="Cancel"
+                onPress={() => setSelectedGame(null)}
+                style={{ alignSelf: 'center' }}
+              />
+            </Stack>
+          </View>
+        </View>
+      </Modal>
       <Stack>
         <Title text="My Games" />
         <ToggleButton
@@ -162,5 +205,26 @@ const styles = StyleSheet.create({
   },
   statContainer: {
     alignItems: 'center',
+  },
+  modalBackdrop: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  modal: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'stretch',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });

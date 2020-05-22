@@ -59,7 +59,7 @@ export const JoinGameScreen: React.FC<{
       if (game) {
         addGame(game);
         navigation.dispatch(
-          StackActions.replace(Routes.Lobby, { gameId: game.id })
+          StackActions.replace(Routes.Game, { gameId: game.id })
         );
       } else {
         transition(FORM_EVENT.fail);
