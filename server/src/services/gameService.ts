@@ -61,7 +61,7 @@ const gameService = {
       .mutate({
         variables: { gameId, variant },
         mutation: gql`
-          mutation SetVariant($gameId: String!, $variant: game_status_enum!) {
+          mutation SetVariant($gameId: String!, $variant: game_variant_enum!) {
             update_games(
               where: { id: { _eq: $gameId } }
               _set: { variant: $variant }

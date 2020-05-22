@@ -192,7 +192,10 @@ export const GameLobbyScreen: React.FC<{
   }
 
   function handleGameStart(variant: BoardVariant) {
-    gameService.startGame(game.id, variant);
+    setUpdating(false);
+    gameService.startGame(game.id, variant).catch(() => {
+      setStarting(false);
+    });
   }
 
   const readyPlayerCount = game.game_players.filter((player) => player.ready)
@@ -228,7 +231,7 @@ export const GameLobbyScreen: React.FC<{
         text={
           game.game_players.length > 1
             ? readyPlayerCount === game.game_players.length
-              ? 'All Plyers Ready!'
+              ? 'All Players Ready!'
               : `${readyPlayerCount}/${game.game_players.length} Players Ready`
             : 'No Players'
         }
@@ -621,7 +624,7 @@ const StartGameModal: React.FC<{
         <BoardThumbnail variant={variant} opacity={disabled ? 0.3 : 1} />
         <View style={styles.boardOptionLabelContainer}>
           <Label text={label} style={{ opacity: disabled ? 0.3 : 1 }} />
-          {disabled && (
+          {termCount < minimum && (
             <Text style={[styles.subLabel]}>
               Requires {minimum - termCount} more term
               {minimum - termCount > 1 ? 's' : ''}
