@@ -19,10 +19,8 @@ router.post('/createGame', async function (req, res) {
 
   let game = await gameService.createGame(gameName, userId);
 
-  console.log(gameId);
   if (gameId) {
     const fromGame = await gameService.getGame(gameId);
-    console.log(fromGame);
     if (fromGame) {
       fromGame.terms.forEach(async (term) => {
         await gameService.insertTerm(game.id, term.text);
@@ -108,6 +106,10 @@ router.post('/markTerm', async function (req, res) {
 
     res.status(204).send();
   }
+});
+
+router.get('/', (req, res) => {
+  res.status(204).send();
 });
 
 export default router;

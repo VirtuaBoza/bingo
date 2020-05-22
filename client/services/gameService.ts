@@ -40,7 +40,6 @@ function createGame(
   userId: string,
   fromGameId?: string
 ): Promise<Game> {
-  console.log(fromGameId);
   return httpClient.post(
     `${getEnvVars()?.url}/api/createGame?gameName=${gameName}&userId=${userId}${
       fromGameId ? `&gameId=${fromGameId}` : ''

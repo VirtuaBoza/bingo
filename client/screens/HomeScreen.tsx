@@ -15,14 +15,14 @@ export const HomeScreen: React.FC<any> = ({ navigation, resetStore }) => {
       </View>
       <MenuButton
         style={styles.primaryButton}
-        title="Join a Game"
-        route={Routes.JoinGame}
+        title="Start a New Game"
+        route={Routes.NewGame}
         navigation={navigation}
       />
       <Stack>
         <MenuButton
-          title="Start a New Game"
-          route={Routes.NewGame}
+          title="Join a Game"
+          route={Routes.JoinGame}
           navigation={navigation}
         />
         <MenuButton

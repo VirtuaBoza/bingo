@@ -28,6 +28,7 @@ export const NewGameScreen: React.FC<{
   const [internalUserName, setInternalUserName] = useState(user.username || '');
   const ref = useRef<any>();
   const [currentState, transition] = useFormStateMachine();
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (internalUserName) {
@@ -85,6 +86,7 @@ export const NewGameScreen: React.FC<{
               console.error(err);
             }
             transition(FORM_EVENT.fail);
+            setError(err);
           });
       } else {
         createGame(gameName, user.id);
@@ -124,9 +126,7 @@ export const NewGameScreen: React.FC<{
             animating={currentState.matches(FORM_STATE.submitting)}
             size="large"
           />
-          {currentState.matches(FORM_STATE.failure) && (
-            <Text>Something went wrong.</Text>
-          )}
+          {currentState.matches(FORM_STATE.failure) && <Text>{error}</Text>}
         </Stack>
         <Button
           title="Let's Go!"
