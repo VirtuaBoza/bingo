@@ -1,7 +1,14 @@
 import { StackActions } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { Button, Input, PageContainer, Stack, Title } from '../components';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import {
+  Button,
+  Input,
+  PageContainer,
+  Stack,
+  Text,
+  Title,
+} from '../components';
 import Routes from '../constants/Routes';
 import {
   FORM_EVENT,
@@ -28,7 +35,6 @@ export const NewGameScreen: React.FC<{
   const [internalUserName, setInternalUserName] = useState(user.username || '');
   const ref = useRef<any>();
   const [currentState, transition] = useFormStateMachine();
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (internalUserName) {
@@ -86,7 +92,6 @@ export const NewGameScreen: React.FC<{
               console.error(err);
             }
             transition(FORM_EVENT.fail);
-            setError(err);
           });
       } else {
         createGame(gameName, user.id);
@@ -126,7 +131,9 @@ export const NewGameScreen: React.FC<{
             animating={currentState.matches(FORM_STATE.submitting)}
             size="large"
           />
-          {currentState.matches(FORM_STATE.failure) && <Text>{error}</Text>}
+          {currentState.matches(FORM_STATE.failure) && (
+            <Text style={{ textAlign: 'center' }}>Something went wrong.</Text>
+          )}
         </Stack>
         <Button
           title="Let's Go!"
