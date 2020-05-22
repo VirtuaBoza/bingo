@@ -1,4 +1,5 @@
 {
+  "version": "0.1.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -51,6 +52,8 @@
     "@types/react-native": "^0.62.4",
     "babel-preset-expo": "~8.0.0",
     "jest-expo": "~36.0.1",
+    "standard-version": "^7.1.0",
+    "standard-version-expo": "^1.0.3",
     "typescript": "^3.8.3"
   },
   "private": true

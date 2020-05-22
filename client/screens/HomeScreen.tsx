@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, PageContainer, Stack } from '../components';
+import app from '../app.json';
+import { Button, PageContainer, Stack, Text } from '../components';
 import Routes from '../constants/Routes';
 import { connect, createRootResetAction, initialState } from '../store';
 import MafingoLogo from '../svg/MafingoLogo';
@@ -37,6 +38,9 @@ export const HomeScreen: React.FC<any> = ({ navigation, resetStore }) => {
           />
         )}
       </Stack>
+      <Text style={{ textAlign: 'right', marginBottom: -10 }}>
+        {app.expo.version}
+      </Text>
     </PageContainer>
   );
 };
