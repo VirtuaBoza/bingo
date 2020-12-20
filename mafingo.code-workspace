@@ -1,7 +1,10 @@
 {
   "folders": [
     {
-      "path": "client"
+      "path": "web-client"
+    },
+    {
+      "path": "rn-client"
     },
     {
       "path": "server"
@@ -10,5 +13,7 @@
       "path": "mafingo-core"
     }
   ],
-  "settings": {}
+  "settings": {
+    "git.ignoreLimitWarning": true
+  }
 }
