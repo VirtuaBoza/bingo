@@ -11,9 +11,13 @@
     },
     {
       "path": "mafingo-core"
+    },
+    {
+      "path": "."
     }
   ],
   "settings": {
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "typescript.tsdk": "web-client\\node_modules\\typescript\\lib"
   }
 }

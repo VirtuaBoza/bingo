@@ -1,21 +1,15 @@
-import React from 'react';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import MainMenu from './pages/MainMenu';
 
 function App() {
   return (
-    <div>
-      <header>
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Switch>
+        <Route>
+          <MainMenu />
+        </Route>
+      </Switch>
+    </BrowserRouter>
   );
 }
 
