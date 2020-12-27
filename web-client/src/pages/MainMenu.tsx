@@ -11,7 +11,6 @@ const MainMenu: React.FC = () => {
       >
         test
       </span>
-      Main Menu
     </React.Fragment>
   );
 };

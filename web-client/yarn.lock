@@ -2,11 +2,33 @@
 # yarn lockfile v1
 
 
-"@abizzle/react-scripts@^4.0.1-8":
-  version "4.0.1-8"
-  resolved "https://registry.yarnpkg.com/@abizzle/react-scripts/-/react-scripts-4.0.1-8.tgz#125a60f3dfd7942d2557d326079c58c0fd3809dc"
-  integrity sha512-KIiu9szVJwUKdy2MF/ecPWvG2OLJ4xrwvciLsGdDzY0Fcfxz1c3AQlOxVbUxhKf16D/rKiid6BL115PmfCiUzQ==
+"@abizzle/babel-preset-react-app@^10.0.0-1":
+  version "10.0.0-1"
+  resolved "https://registry.yarnpkg.com/@abizzle/babel-preset-react-app/-/babel-preset-react-app-10.0.0-1.tgz#625c1d3896c6114b459b3aeded70b48e4518576c"
+  integrity sha512-NHXqFaxbvSAZgYRNaV5cHeAqSiDwsSGq4vTH0VNynVujcd6vHhzHWIxt203DZCYt86xlZknjihewP9NFipmnQA==
   dependencies:
+    "@babel/core" "7.12.3"
+    "@babel/plugin-proposal-class-properties" "7.12.1"
+    "@babel/plugin-proposal-decorators" "7.12.1"
+    "@babel/plugin-proposal-nullish-coalescing-operator" "7.12.1"
+    "@babel/plugin-proposal-numeric-separator" "7.12.1"
+    "@babel/plugin-proposal-optional-chaining" "7.12.1"
+    "@babel/plugin-transform-flow-strip-types" "7.12.1"
+    "@babel/plugin-transform-react-display-name" "7.12.1"
+    "@babel/plugin-transform-runtime" "7.12.1"
+    "@babel/preset-env" "7.12.1"
+    "@babel/preset-react" "7.12.1"
+    "@babel/preset-typescript" "7.12.1"
+    "@babel/runtime" "7.12.1"
+    babel-plugin-macros "2.8.0"
+    babel-plugin-transform-react-remove-prop-types "0.4.24"
+
+"@abizzle/react-scripts@^4.0.1-11":
+  version "4.0.1-11"
+  resolved "https://registry.yarnpkg.com/@abizzle/react-scripts/-/react-scripts-4.0.1-11.tgz#f89bb617b4da5489950a076a5d6a70a86a9fcd22"
+  integrity sha512-x6da5A4ov91qioIOjjCzHoc4M+XN0aKXTeNwnxe8UaNtG2kLDCR+6wTO09/dAku0MvCl9z0zXCK1Bc6y7iTzhw==
+  dependencies:
+    "@abizzle/babel-preset-react-app" "^10.0.0-1"
     "@babel/core" "7.12.3"
     "@babel/preset-env" "^7.12.11"
     "@babel/preset-react" "^7.12.10"
@@ -21,7 +43,6 @@
     babel-jest "^26.6.0"
     babel-loader "8.1.0"
     babel-plugin-named-asset-import "^0.3.7"
-    babel-preset-react-app "^10.0.0"
     bfj "^7.0.2"
     camelcase "^6.1.0"
     case-sensitive-paths-webpack-plugin "2.3.0"
@@ -2812,27 +2833,6 @@ babel-preset-jest@^26.6.2:
   dependencies:
     babel-plugin-jest-hoist "^26.6.2"
     babel-preset-current-node-syntax "^1.0.0"
-
-babel-preset-react-app@^10.0.0:
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/babel-preset-react-app/-/babel-preset-react-app-10.0.0.tgz#689b60edc705f8a70ce87f47ab0e560a317d7045"
-  integrity sha512-itL2z8v16khpuKutx5IH8UdCdSTuzrOhRFTEdIhveZ2i1iBKDrVE0ATa4sFVy+02GLucZNVBWtoarXBy0Msdpg==
-  dependencies:
-    "@babel/core" "7.12.3"
-    "@babel/plugin-proposal-class-properties" "7.12.1"
-    "@babel/plugin-proposal-decorators" "7.12.1"
-    "@babel/plugin-proposal-nullish-coalescing-operator" "7.12.1"
-    "@babel/plugin-proposal-numeric-separator" "7.12.1"
-    "@babel/plugin-proposal-optional-chaining" "7.12.1"
-    "@babel/plugin-transform-flow-strip-types" "7.12.1"
-    "@babel/plugin-transform-react-display-name" "7.12.1"
-    "@babel/plugin-transform-runtime" "7.12.1"
-    "@babel/preset-env" "7.12.1"
-    "@babel/preset-react" "7.12.1"
-    "@babel/preset-typescript" "7.12.1"
-    "@babel/runtime" "7.12.1"
-    babel-plugin-macros "2.8.0"
-    babel-plugin-transform-react-remove-prop-types "0.4.24"
 
 babel-runtime@^6.26.0:
   version "6.26.0"
