@@ -1,15 +1,16 @@
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import MainMenu from './pages/MainMenu';
+import RootProvider from './RootProvider';
 
 function App() {
   return (
-    <BrowserRouter>
+    <RootProvider>
       <Switch>
         <Route>
           <MainMenu />
         </Route>
       </Switch>
-    </BrowserRouter>
+    </RootProvider>
   );
 }
 
