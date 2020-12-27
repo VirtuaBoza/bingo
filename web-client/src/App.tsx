@@ -1,5 +1,5 @@
 import { Route, Switch } from 'react-router-dom';
-import MainMenu from './pages/MainMenu';
+import { MainMenu } from './pages';
 import RootProvider from './RootProvider';
 
 function App() {

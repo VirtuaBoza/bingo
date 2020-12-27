@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import React from 'react';
-import Theme from '../interfaces/Theme';
+import { useTheme } from '../hooks';
 
 export interface TextFieldProps
   extends Pick<
@@ -14,6 +14,8 @@ export interface TextFieldProps
 }
 
 const TextField: React.FC<TextFieldProps> = ({ label, onChange, value }) => {
+  const { color } = useTheme();
+
   return (
     <label
       css={css`
@@ -22,12 +24,9 @@ const TextField: React.FC<TextFieldProps> = ({ label, onChange, value }) => {
       `}
     >
       <span
-        css={(theme: Theme) => {
-          const { color } = theme as Theme;
-          return css`
-            color: ${color.primary[500]};
-          `;
-        }}
+        css={css`
+          color: ${color.primary[500]};
+        `}
       >
         {label}
       </span>

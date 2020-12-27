@@ -3,7 +3,7 @@ import { useButton } from '@react-aria/button';
 import { AriaButtonProps } from '@react-types/button';
 import { PressEvent } from '@react-types/shared';
 import React, { ReactNode, useRef } from 'react';
-import Theme from '../interfaces/Theme';
+import { useTheme } from '../hooks';
 
 export interface ButtonProps
   extends Pick<AriaButtonProps<'button'>, 'isDisabled' | 'onPress'> {
@@ -21,7 +21,7 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
   const ref = useRef<HTMLButtonElement>(null);
   const { buttonProps } = useButton({ isDisabled, onPress }, ref);
-  console.log(buttonProps);
+  const { color, fontStyle, fontSize } = useTheme();
 
   function handleMouseLeave() {
     if (ref.current) {
@@ -33,32 +33,30 @@ const Button: React.FC<ButtonProps> = ({
     <>
       {type === 'primary' && (
         <button
-          css={({ color, fontStyle, fontSize }: Theme) =>
-            css`
-              font-family: ${fontStyle.title};
-              font-size: ${fontSize.h5};
-              background-color: ${color.primary[500]};
-              color: ${color.primary[100]};
-              border: none;
-              border-radius: 50px;
-              height: 48px;
-              width: 274px;
-              &:hover:not(:disabled),
-              &:focus:not(:disabled) {
-                margin-top: -4px;
-                filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
-                outline: none;
-              }
-              &:active {
-                margin-top: 0px;
-                filter: none;
-                box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
-              }
-              &:disabled {
-                background-color: ${color.primary[200]};
-              }
-            `
-          }
+          css={css`
+            font-family: ${fontStyle.title};
+            font-size: ${fontSize.h5};
+            background-color: ${color.primary[500]};
+            color: ${color.primary[100]};
+            border: none;
+            border-radius: 50px;
+            height: 48px;
+            width: 274px;
+            &:hover:not(:disabled),
+            &:focus:not(:disabled) {
+              margin-top: -4px;
+              filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+              outline: none;
+            }
+            &:active {
+              margin-top: 0px;
+              filter: none;
+              box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+            }
+            &:disabled {
+              background-color: ${color.primary[200]};
+            }
+          `}
           onMouseLeave={handleMouseLeave}
           {...buttonProps}
           ref={ref}
@@ -68,7 +66,7 @@ const Button: React.FC<ButtonProps> = ({
       )}
       {type === 'secondary' && (
         <button
-          css={({ color, fontStyle, fontSize }: Theme) => css`
+          css={css`
             font-family: ${fontStyle.title};
             font-size: ${fontSize.h5};
             border: none;
@@ -93,7 +91,7 @@ const Button: React.FC<ButtonProps> = ({
       )}
       {type === 'icon' && (
         <button
-          css={({ color }: Theme) => css`
+          css={css`
             border-radius: 50%;
             border: 5px solid ${color.primary[500]};
             background-color: ${color.primary[100]};
