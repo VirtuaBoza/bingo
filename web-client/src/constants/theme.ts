@@ -14,7 +14,9 @@ const theme: Theme = {
       '500': '#646464',
     },
   },
-  spacing: {},
+  spacing: {
+    small: '8px',
+  },
   fontStyle: {
     title: 'Fugaz One',
     paragraph: 'Work Sans',

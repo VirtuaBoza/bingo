@@ -14,7 +14,9 @@ export default interface Theme extends EmotionTheme {
       '500': string;
     };
   };
-  spacing: {};
+  spacing: {
+    small: string;
+  };
   fontStyle: {
     title: string;
     paragraph: string;
