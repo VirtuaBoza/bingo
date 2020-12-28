@@ -4,7 +4,7 @@ import React from 'react';
 import Button, { ButtonProps } from './Button';
 
 export default {
-  title: 'Example/Button',
+  title: 'Input/Button',
   component: Button,
   argTypes: {
     backgroundColor: { control: 'color' },
@@ -23,10 +23,4 @@ export const Secondary = Template.bind({});
 Secondary.args = {
   type: 'secondary',
   label: 'Button',
-};
-
-export const Icon = Template.bind({});
-Icon.args = {
-  type: 'icon',
-  label: '',
 };
