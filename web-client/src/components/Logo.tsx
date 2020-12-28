@@ -11,6 +11,7 @@ const Logo: React.FC = () => {
         justify-content: center;
         position: relative;
         width: 100%;
+        height: 100%;
       `}
     >
       <img

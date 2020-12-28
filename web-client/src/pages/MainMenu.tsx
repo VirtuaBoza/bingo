@@ -9,12 +9,22 @@ const MainMenu: React.FC = () => {
     <div
       css={css`
         height: 100vh;
+        box-sizing: border-box;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: column;
+        /* align-items: center; */
+        /* justify-content: center; */
         padding: ${spacing.small};
       `}
     >
+      <div
+        css={css`
+          flex: 1;
+          min-height: 0;
+        `}
+      >
+        <Logo />
+      </div>
       <div
         css={css`
           display: grid;
@@ -22,7 +32,6 @@ const MainMenu: React.FC = () => {
           justify-items: center;
         `}
       >
-        <Logo />
         <Button onPress={() => {}} label="Start a New Game" />
         <Button onPress={() => {}} label="Join a Game" />
         <Button onPress={() => {}} label="My Games" />
